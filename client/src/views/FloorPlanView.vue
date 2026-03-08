@@ -131,7 +131,8 @@ async function loadCapacity() {
 watch(activeSlotId, () => loadCapacity())
 
 function getTableStyle(table: TableItem) {
-  const statusColor = table.current_status ? statusColors[table.current_status] || 'var(--addrez-border)' : 'var(--addrez-border)'
+  const sc = table.current_status ? statusColors[table.current_status] || 'var(--addrez-border)' : 'var(--addrez-border)'
+  const isRound = table.shape === 'Circle' || table.shape === 'Oval' || table.shape === 'Round'
   return {
     position: 'absolute' as const,
     left: `${table.x}px`,
@@ -139,9 +140,10 @@ function getTableStyle(table: TableItem) {
     width: `${table.width}px`,
     height: `${table.height}px`,
     transform: `rotate(${table.rotation}deg)`,
-    borderRadius: table.shape === 'Circle' || table.shape === 'Oval' || table.shape === 'Round' ? '50%' : '8px',
-    border: `2px solid ${statusColor}`,
-    backgroundColor: table.current_status ? statusColor + '15' : 'var(--addrez-bg-card)',
+    borderRadius: isRound ? '50%' : '8px',
+    border: `2.5px solid ${sc}`,
+    backgroundColor: table.current_status ? sc + '22' : 'var(--addrez-bg-card)',
+    boxShadow: `inset 0 0 0 2px ${table.current_status ? sc + '18' : 'var(--addrez-border)'}`,
     cursor: table.current_status ? 'default' : 'pointer',
     display: 'flex',
     alignItems: 'center',
@@ -256,11 +258,11 @@ onMounted(loadLayouts)
             :title="`${table.name} (${table.min_covers}-${table.max_covers} covers)${table.current_reservation_guest ? '\n' + table.current_reservation_guest : ''}${!table.current_status ? '\nClick to reserve' : ''}`"
             @click="openReserveDialog(table)"
           >
-            <span class="text-xs font-bold" :style="{ color: table.current_status ? statusColors[table.current_status] : 'var(--addrez-text-primary)' }">
+            <span class="text-sm font-bold leading-tight" :style="{ color: table.current_status ? statusColors[table.current_status] : 'var(--addrez-text-primary)' }">
               {{ table.label || table.name }}
             </span>
-            <span class="text-[10px]" :style="{ color: 'var(--addrez-text-secondary)' }">{{ table.max_covers }}</span>
-            <span v-if="table.current_reservation_guest" class="text-[9px] mt-0.5" :style="{ color: statusColors[table.current_status!] }">
+            <span class="text-xs leading-tight" :style="{ color: 'var(--addrez-text-secondary)' }">{{ table.max_covers }}</span>
+            <span v-if="table.current_reservation_guest" class="text-[10px] mt-0.5 leading-tight" :style="{ color: statusColors[table.current_status!] }">
               {{ table.current_reservation_guest }}
             </span>
           </div>
@@ -273,12 +275,12 @@ onMounted(loadLayouts)
               left: lm.x + 'px', top: lm.y + 'px',
               width: lm.width + 'px', height: lm.height + 'px',
               transform: `rotate(${lm.rotation}deg)`,
-              border: '1px dashed var(--addrez-border)',
-              borderRadius: '4px',
-              opacity: 0.6
+              border: '2px solid #64748b90',
+              borderRadius: '6px',
+              backgroundColor: '#64748b20'
             }"
           >
-            <span class="text-[10px]" :style="{ color: 'var(--addrez-text-secondary)' }">{{ lm.name }}</span>
+            <span class="text-xs font-semibold" style="color: #64748b">{{ lm.name }}</span>
           </div>
         </div>
 

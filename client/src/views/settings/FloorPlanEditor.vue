@@ -402,15 +402,18 @@ async function saveLayout() {
 function getObjStyle(o: EditorObject, i: number) {
   const sel = isSelected(o, i)
   const isTable = o.type === 'table'
+  const borderColor = sel ? 'var(--addrez-gold)' : isTable ? '#3b82f6' : '#64748b'
   return {
     position: 'absolute' as const,
     left: `${o.x}px`, top: `${o.y}px`,
     width: `${o.width}px`, height: `${o.height}px`,
     borderRadius: o.shape === 'Round' ? '50%' : o.shape === 'Booth' ? '12px 12px 4px 4px' : '6px',
-    border: sel ? '2px solid var(--addrez-gold)' : `2px solid ${isTable ? '#3b82f680' : '#6b728050'}`,
-    backgroundColor: isTable ? '#3b82f618' : '#6b728018',
+    border: `2.5px solid ${borderColor}`,
+    backgroundColor: isTable ? '#3b82f622' : '#64748b25',
+    boxShadow: sel
+      ? `0 0 0 3px rgba(212,168,83,0.3), inset 0 0 0 2px ${borderColor}30`
+      : `inset 0 0 0 2px ${isTable ? '#3b82f618' : '#64748b18'}`,
     cursor: 'move', transform: o.rotation ? `rotate(${o.rotation}deg)` : undefined,
-    boxShadow: sel ? '0 0 0 3px rgba(212,168,83,0.3)' : undefined,
     zIndex: sel ? 10 : 1
   }
 }
@@ -558,10 +561,10 @@ onUnmounted(() => {
               @dblclick.stop="() => { selectedIds.clear(); selectedIds.add(objKey(o, i)); editSelected() }"
             >
               <div class="text-center pointer-events-none">
-                <div class="text-[10px] font-bold" :style="{ color: o.type === 'table' ? '#3b82f6' : 'var(--addrez-text-secondary)' }">
+                <div class="text-xs font-bold" :style="{ color: o.type === 'table' ? '#3b82f6' : '#64748b' }">
                   {{ o.label || o.name }}
                 </div>
-                <div v-if="o.type === 'table'" class="text-[8px]" :style="{ color: 'var(--addrez-text-secondary)' }">
+                <div v-if="o.type === 'table'" class="text-[10px]" :style="{ color: 'var(--addrez-text-secondary)' }">
                   {{ o.minCovers }}-{{ o.maxCovers }}
                 </div>
               </div>
