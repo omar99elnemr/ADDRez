@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <linearGradient id="bgF" x1="16" y1="12" x2="116" y2="120" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE1EB"/>
+      <stop offset="1" stop-color="#FFD0DD"/>
+    </linearGradient>
+    <linearGradient id="hairF" x1="64" y1="18" x2="64" y2="108" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7E3A2F"/>
+      <stop offset="1" stop-color="#5F261E"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="128" height="128" rx="64" fill="url(#bgF)"/>
+
+  <!-- Hair back -->
+  <path d="M22 85C22 52 39 24 64 24C89 24 106 52 106 85C106 100 97 112 84 112H44C31 112 22 100 22 85Z" fill="url(#hairF)"/>
+
+  <!-- Neck -->
+  <rect x="56" y="72" width="16" height="14" rx="7" fill="#F3C6AE"/>
+
+  <!-- Face -->
+  <ellipse cx="64" cy="58" rx="24" ry="27" fill="#F7D2BD"/>
+
+  <!-- Eyes -->
+  <ellipse cx="54" cy="58" rx="5" ry="4" fill="#fff"/>
+  <ellipse cx="74" cy="58" rx="5" ry="4" fill="#fff"/>
+  <circle cx="54" cy="58" r="2" fill="#35554A"/>
+  <circle cx="74" cy="58" r="2" fill="#35554A"/>
+
+  <!-- Brows -->
+  <path d="M49 52C51 50 56 50 59 52" stroke="#5C2A22" stroke-width="2" stroke-linecap="round"/>
+  <path d="M69 52C72 50 77 50 79 52" stroke="#5C2A22" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Nose -->
+  <path d="M64 61V66" stroke="#DAA996" stroke-width="1.8" stroke-linecap="round"/>
+
+  <!-- Lips -->
+  <path d="M56 71C59 74 69 74 72 71" stroke="#E84E63" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Hair front -->
+  <path d="M40 48C40 33 50 24 64 24C78 24 88 33 88 48C82 44 74 43 66 45C57 47 49 49 40 48Z" fill="#6D3027"/>
+
+  <!-- Shoulders / top -->
+  <path d="M35 112C37 97 48 88 64 88C80 88 91 97 93 112" fill="#F25B52"/>
+</svg>

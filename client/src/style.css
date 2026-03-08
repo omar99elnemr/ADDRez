@@ -1,0 +1,77 @@
+@import "tailwindcss";
+@import "primeicons/primeicons.css";
+
+/* ── ADDRez Design Tokens ── */
+:root {
+  --addrez-gold: #d4a853;
+  --addrez-gold-light: #e8c67a;
+  --addrez-gold-dark: #b08a3e;
+}
+
+/* ── Midnight Luxury (Dark) ── */
+.theme-dark {
+  --addrez-bg-primary: #0f0f14;
+  --addrez-bg-secondary: #1a1a24;
+  --addrez-bg-card: #22222e;
+  --addrez-bg-hover: #2a2a38;
+  --addrez-text-primary: #f0ece4;
+  --addrez-text-secondary: #a09c94;
+  --addrez-border: #333340;
+  --addrez-sidebar-bg: #13131a;
+  --addrez-sidebar-active: rgba(212, 168, 83, 0.12);
+}
+
+/* ── Golden Day (Light) — eye-care warm tones ── */
+.theme-light {
+  --addrez-bg-primary: #f7f5f0;
+  --addrez-bg-secondary: #fefdfb;
+  --addrez-bg-card: #ffffff;
+  --addrez-bg-hover: #f0ece4;
+  --addrez-text-primary: #2c2a26;
+  --addrez-text-secondary: #78756c;
+  --addrez-border: #e2ddd3;
+  --addrez-sidebar-bg: #efeae0;
+  --addrez-sidebar-active: rgba(180, 138, 62, 0.14);
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--addrez-bg-primary);
+  color: var(--addrez-text-primary);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* ── Scrollbar styling ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--addrez-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--addrez-gold); }
+
+/* ── Utility ── */
+.gold-gradient {
+  background: linear-gradient(135deg, var(--addrez-gold), var(--addrez-gold-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.card {
+  background: var(--addrez-bg-card);
+  border: 1px solid var(--addrez-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, var(--addrez-gold), var(--addrez-gold-dark));
+  color: #1a1a24;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 0.625rem 1.25rem;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-gold:hover { opacity: 0.9; }
+.btn-gold:active { transform: scale(0.98); }

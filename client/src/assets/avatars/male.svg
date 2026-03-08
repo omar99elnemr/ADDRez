@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <linearGradient id="bgM" x1="14" y1="12" x2="116" y2="120" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D9ECFF"/>
+      <stop offset="1" stop-color="#BDDFFF"/>
+    </linearGradient>
+    <linearGradient id="hairM" x1="64" y1="20" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6E4C3F"/>
+      <stop offset="1" stop-color="#583E35"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="128" height="128" rx="64" fill="url(#bgM)"/>
+
+  <!-- Neck -->
+  <rect x="56" y="72" width="16" height="14" rx="7" fill="#F0C6AE"/>
+
+  <!-- Face -->
+  <ellipse cx="64" cy="58" rx="24" ry="27" fill="#F7D4BF"/>
+
+  <!-- Hair -->
+  <path d="M39 48C39 32 50 24 64 24C78 24 89 32 89 48C84 45 76 43 67 44C57 45 49 49 39 48Z" fill="url(#hairM)"/>
+
+  <!-- Eyes -->
+  <ellipse cx="54" cy="58" rx="5" ry="4" fill="#fff"/>
+  <ellipse cx="74" cy="58" rx="5" ry="4" fill="#fff"/>
+  <circle cx="54" cy="58" r="2" fill="#3A4A3B"/>
+  <circle cx="74" cy="58" r="2" fill="#3A4A3B"/>
+
+  <!-- Brows -->
+  <path d="M49 52C52 50 56 50 59 52" stroke="#4D362E" stroke-width="2" stroke-linecap="round"/>
+  <path d="M69 52C72 50 76 50 79 52" stroke="#4D362E" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Mustache -->
+  <path d="M52 70C55 66 61 66 64 70C67 66 73 66 76 70" stroke="#5A3B31" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Shirt + tie -->
+  <path d="M33 112C36 96 48 88 64 88C80 88 92 96 95 112" fill="#F2F4F7"/>
+  <path d="M61 92H67L69 112H59L61 92Z" fill="#D64545"/>
+</svg>
