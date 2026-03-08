@@ -9,7 +9,18 @@ const route = useRoute()
 const auth = useAuthStore()
 const theme = useThemeStore()
 
-const sidebarCollapsed = ref(false)
+// ── Sidebar state ──
+const sidebarPinned = ref(localStorage.getItem('addrez_sidebar_pinned') !== 'false')
+const sidebarHovered = ref(false)
+const sidebarExpanded = computed(() => sidebarPinned.value || sidebarHovered.value)
+
+function togglePin() {
+  sidebarPinned.value = !sidebarPinned.value
+  localStorage.setItem('addrez_sidebar_pinned', String(sidebarPinned.value))
+}
+function onSidebarEnter() { if (!sidebarPinned.value) sidebarHovered.value = true }
+function onSidebarLeave() { sidebarHovered.value = false }
+
 const showProfileMenu = ref(false)
 const showPasswordDialog = ref(false)
 const passwordForm = ref({ currentPassword: '', newPassword: '', confirmPassword: '' })
@@ -117,56 +128,62 @@ function handleLogout() {
 
 <template>
   <div class="flex h-screen overflow-hidden">
-    <!-- Sidebar -->
+    <!-- ═══ Sidebar ═══ -->
     <aside
-      class="flex flex-col transition-all duration-300 border-r"
-      :class="sidebarCollapsed ? 'w-16' : 'w-60'"
-      :style="{ backgroundColor: 'var(--addrez-sidebar-bg)', borderColor: 'var(--addrez-border)' }"
+      class="sidebar"
+      :class="{ 'sidebar--expanded': sidebarExpanded, 'sidebar--overlay': sidebarHovered && !sidebarPinned }"
+      :style="{ backgroundColor: 'var(--addrez-sidebar-bg)', borderRight: '1px solid var(--addrez-border)' }"
+      @mouseenter="onSidebarEnter"
+      @mouseleave="onSidebarLeave"
     >
       <!-- Logo -->
-      <div class="flex items-center gap-3 px-4 h-16 border-b" :style="{ borderColor: 'var(--addrez-border)' }">
-        <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm"
+      <div class="sidebar__header" :style="{ borderBottom: '1px solid var(--addrez-border)' }">
+        <div class="w-8 h-8 min-w-[32px] rounded-lg flex items-center justify-center font-bold text-sm"
              style="background: linear-gradient(135deg, var(--addrez-gold), var(--addrez-gold-dark)); color: #1a1a24;">
           A
         </div>
-        <span v-if="!sidebarCollapsed" class="font-bold text-lg gold-gradient">ADDRez</span>
+        <span v-show="sidebarExpanded" class="font-bold text-lg gold-gradient whitespace-nowrap">ADDRez</span>
+        <button
+          v-show="sidebarExpanded"
+          @click.stop="togglePin"
+          class="sidebar__pin-btn"
+          :class="{ 'sidebar__pin-btn--active': sidebarPinned }"
+          :title="sidebarPinned ? 'Unpin sidebar' : 'Pin sidebar'"
+        >
+          <i :class="sidebarPinned ? 'pi pi-lock' : 'pi pi-lock-open'" class="text-xs"></i>
+        </button>
       </div>
 
       <!-- Nav -->
-      <nav class="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto">
+      <nav class="flex-1 py-3 px-3 space-y-0.5 overflow-y-auto overflow-x-hidden">
         <router-link
           v-for="item in navItems"
           :key="item.to"
           :to="item.to"
-          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium no-underline"
-          :class="[
-            isActive(item.to)
-              ? 'nav-item-active text-[var(--addrez-gold)]'
-              : 'hover:bg-[var(--addrez-bg-hover)]'
-          ]"
-          :style="isActive(item.to)
-            ? { backgroundColor: 'var(--addrez-sidebar-active)', transition: 'all 180ms ease' }
-            : { color: 'var(--addrez-text-secondary)', transition: 'all 180ms ease' }"
+          class="sidebar__nav-item"
+          :class="{ 'sidebar__nav-item--active': isActive(item.to) }"
+          :title="!sidebarExpanded ? item.label : undefined"
         >
-          <i :class="item.icon" class="text-base w-5 text-center"></i>
-          <span v-if="!sidebarCollapsed">{{ item.label }}</span>
+          <i :class="item.icon" class="sidebar__nav-icon"></i>
+          <span v-show="sidebarExpanded" class="sidebar__nav-label">{{ item.label }}</span>
         </router-link>
       </nav>
 
       <!-- Sidebar footer -->
-      <div class="border-t px-3 py-3" :style="{ borderColor: 'var(--addrez-border)' }">
+      <div class="border-t px-3 py-2" :style="{ borderColor: 'var(--addrez-border)' }">
         <button
-          @click="sidebarCollapsed = !sidebarCollapsed"
-          class="w-full flex items-center justify-center py-2 rounded-lg transition-colors hover:bg-[var(--addrez-bg-hover)] bg-transparent border-0 cursor-pointer"
-          :style="{ color: 'var(--addrez-text-secondary)' }"
+          @click="theme.toggle()"
+          class="sidebar__footer-btn"
+          :title="!sidebarExpanded ? (theme.mode === 'dark' ? 'Light Mode' : 'Dark Mode') : undefined"
         >
-          <i :class="sidebarCollapsed ? 'pi pi-angle-right' : 'pi pi-angle-left'" class="text-base"></i>
+          <i :class="theme.mode === 'dark' ? 'pi pi-sun' : 'pi pi-moon'" class="sidebar__nav-icon"></i>
+          <span v-show="sidebarExpanded" class="sidebar__nav-label">{{ theme.mode === 'dark' ? 'Light' : 'Dark' }} Mode</span>
         </button>
       </div>
     </aside>
 
     <!-- Main content -->
-    <div class="flex-1 flex flex-col overflow-hidden">
+    <div class="flex-1 flex flex-col overflow-hidden" :style="{ marginLeft: sidebarPinned ? '240px' : '64px', transition: 'margin-left 280ms cubic-bezier(0.4, 0, 0.2, 1)' }">
       <!-- Top bar -->
       <header
         class="flex items-center justify-between h-14 px-6 border-b"

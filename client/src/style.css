@@ -231,11 +231,68 @@ select:focus {
   gap: 0.5rem;
 }
 
-/* ── Sidebar nav accent ── */
-.nav-item-active {
+/* ── Sidebar ── */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 64px;
+  display: flex;
+  flex-direction: column;
+  z-index: 30;
+  transition: width 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+.sidebar--expanded { width: 240px; }
+.sidebar--overlay { box-shadow: 4px 0 24px rgba(0,0,0,0.15); }
+.theme-dark .sidebar--overlay { box-shadow: 4px 0 24px rgba(0,0,0,0.4); }
+
+.sidebar__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  height: 56px;
+  min-height: 56px;
   position: relative;
 }
-.nav-item-active::before {
+
+.sidebar__pin-btn {
+  position: absolute;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--addrez-text-muted);
+  cursor: pointer;
+  transition: all var(--addrez-transition);
+}
+.sidebar__pin-btn:hover { background: var(--addrez-bg-hover); color: var(--addrez-text-primary); }
+.sidebar__pin-btn--active { color: var(--addrez-gold); }
+
+.sidebar__nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: var(--addrez-radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--addrez-text-secondary);
+  text-decoration: none;
+  transition: all var(--addrez-transition);
+  white-space: nowrap;
+  position: relative;
+}
+.sidebar__nav-item:hover { background: var(--addrez-bg-hover); color: var(--addrez-text-primary); }
+.sidebar__nav-item--active { background: var(--addrez-sidebar-active); color: var(--addrez-gold); }
+.sidebar__nav-item--active::before {
   content: '';
   position: absolute;
   left: 0;
@@ -245,6 +302,27 @@ select:focus {
   border-radius: 0 3px 3px 0;
   background: var(--addrez-gold);
 }
+
+.sidebar__nav-icon { width: 20px; min-width: 20px; text-align: center; font-size: 1rem; }
+.sidebar__nav-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.sidebar__footer-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: var(--addrez-radius-md);
+  width: 100%;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--addrez-text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all var(--addrez-transition);
+  white-space: nowrap;
+}
+.sidebar__footer-btn:hover { background: var(--addrez-bg-hover); color: var(--addrez-text-primary); }
 
 /* ── Subtle divider ── */
 .divider {
