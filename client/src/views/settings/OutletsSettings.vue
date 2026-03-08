@@ -84,8 +84,8 @@ async function toggleActive(o: Outlet) {
     })
     toast.add({ severity: 'success', summary: 'Updated', detail: `Outlet ${o.is_active ? 'deactivated' : 'activated'}`, life: 2000 })
     await load()
-  } catch {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update', life: 3000 })
+  } catch (err: any) {
+    toast.add({ severity: 'error', summary: 'Error', detail: err.response?.data?.message || 'Failed to update', life: 4000 })
   }
 }
 

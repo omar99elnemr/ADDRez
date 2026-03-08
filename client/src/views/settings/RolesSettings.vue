@@ -75,7 +75,7 @@ async function doDelete() {
     await api.delete(`/settings/roles/${id}`)
     toast.add({ severity: 'success', summary: 'Deleted', detail: 'Role deleted', life: 2000 })
     load()
-  } catch { toast.add({ severity: 'error', summary: 'Error', detail: 'Cannot delete system roles', life: 3000 }) }
+  } catch (err: any) { toast.add({ severity: 'error', summary: 'Error', detail: err.response?.data?.message || 'Failed to delete role', life: 4000 }) }
 }
 
 function toggleGroup(group: string) {

@@ -53,12 +53,14 @@ function openCreate() {
 
 function openEdit(u: UserListItem) {
   editingId.value = u.id
-  const matchedRole = roles.value.find(r => u.roles.includes(r.name))
+  const matchedRole = roles.value.find(r => (u.roles ?? []).includes(r.name))
   form.value = {
-    username: u.username, email: u.email, password: '', first_name: u.full_name.split(' ')[0] || '',
-    last_name: u.full_name.split(' ').slice(1).join(' ') || '', phone: u.phone || '',
+    username: u.username, email: u.email, password: '',
+    first_name: u.first_name || u.full_name?.split(' ')[0] || '',
+    last_name: u.last_name || u.full_name?.split(' ').slice(1).join(' ') || '',
+    phone: u.phone || '',
     role_id: matchedRole?.id ?? null,
-    branch_ids: outlets.value.filter(b => u.outlets.includes(b.name)).map(b => b.id),
+    branch_ids: outlets.value.filter(b => (u.outlets ?? []).includes(b.name)).map(b => b.id),
     is_active: u.is_active
   }
   showDialog.value = true
@@ -88,16 +90,20 @@ async function save() {
 
 async function toggleActive(u: UserListItem) {
   try {
-    const matchedRole = roles.value.find(r => u.roles.includes(r.name))
+    const matchedRole = roles.value.find(r => (u.roles ?? []).includes(r.name))
     await api.put(`/settings/users/${u.id}`, {
-      email: u.email, first_name: u.full_name.split(' ')[0], last_name: u.full_name.split(' ').slice(1).join(' '),
+      email: u.email,
+      first_name: u.first_name || u.full_name?.split(' ')[0] || '',
+      last_name: u.last_name || u.full_name?.split(' ').slice(1).join(' ') || '',
       phone: u.phone || '', is_active: !u.is_active,
       role_ids: matchedRole ? [matchedRole.id] : [],
-      branch_ids: outlets.value.filter(b => u.outlets.includes(b.name)).map(b => b.id)
+      branch_ids: outlets.value.filter(b => (u.outlets ?? []).includes(b.name)).map(b => b.id)
     })
     toast.add({ severity: 'success', summary: 'Updated', detail: u.is_active ? 'User deactivated' : 'User activated', life: 2000 })
     load()
-  } catch { toast.add({ severity: 'error', summary: 'Error', detail: 'Failed', life: 3000 }) }
+  } catch (err: any) {
+    toast.add({ severity: 'error', summary: 'Error', detail: err.response?.data?.message || err.message || 'Failed to update user', life: 4000 })
+  }
 }
 
 function openResetPassword(u: UserListItem) {
@@ -115,7 +121,7 @@ async function doResetPassword() {
     await api.post(`/settings/users/${resetUserId.value}/reset-password`, { new_password: resetPassword.value })
     toast.add({ severity: 'success', summary: 'Done', detail: 'Password reset', life: 2000 })
     showResetDialog.value = false
-  } catch { toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to reset', life: 3000 }) }
+  } catch (err: any) { toast.add({ severity: 'error', summary: 'Error', detail: err.response?.data?.message || 'Failed to reset password', life: 4000 }) }
 }
 
 onMounted(load)
