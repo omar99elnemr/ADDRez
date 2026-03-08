@@ -1,19 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" fill="none">
   <defs>
     <linearGradient id="bgU" x1="12" y1="10" x2="116" y2="118" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#EAF0F7"/>
-      <stop offset="1" stop-color="#DCE5F1"/>
+      <stop stop-color="#EEF3FA"/>
+      <stop offset="1" stop-color="#DCE6F2"/>
+    </linearGradient>
+    <linearGradient id="silU" x1="64" y1="34" x2="64" y2="112" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8794A8"/>
+      <stop offset="1" stop-color="#667488"/>
     </linearGradient>
   </defs>
 
   <rect width="128" height="128" rx="64" fill="url(#bgU)"/>
 
   <!-- Neutral silhouette -->
-  <ellipse cx="64" cy="58" rx="23" ry="26" fill="#7C8798"/>
-  <path d="M32 112C35 97 47 88 64 88C81 88 93 97 96 112" fill="#6F7B8C"/>
+  <ellipse cx="64" cy="58" rx="23" ry="26" fill="url(#silU)"/>
+  <ellipse cx="64" cy="49" rx="14" ry="7" fill="#9AA5B7" opacity="0.35"/>
+  <path d="M32 112C35 97 47 88 64 88C81 88 93 97 96 112" fill="#6B788C"/>
 
   <!-- Placeholder badge -->
-  <circle cx="96" cy="34" r="15" fill="#C7D3E4"/>
-  <path d="M96 27V41" stroke="#4E5F77" stroke-width="3" stroke-linecap="round"/>
-  <path d="M89 34H103" stroke="#4E5F77" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="96" cy="34" r="15" fill="#C9D5E7"/>
+  <path d="M96 27V41" stroke="#4C5E79" stroke-width="3" stroke-linecap="round"/>
+  <path d="M89 34H103" stroke="#4C5E79" stroke-width="3" stroke-linecap="round"/>
 </svg>

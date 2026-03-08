@@ -1,45 +1,57 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" fill="none">
   <defs>
-    <linearGradient id="bgF" x1="16" y1="12" x2="116" y2="120" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FFE1EB"/>
-      <stop offset="1" stop-color="#FFD0DD"/>
+    <linearGradient id="bgF" x1="12" y1="8" x2="118" y2="120" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE7F0"/>
+      <stop offset="1" stop-color="#FFD3E1"/>
     </linearGradient>
-    <linearGradient id="hairF" x1="64" y1="18" x2="64" y2="108" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#7E3A2F"/>
-      <stop offset="1" stop-color="#5F261E"/>
+    <linearGradient id="hairF" x1="64" y1="16" x2="64" y2="112" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8E4334"/>
+      <stop offset="1" stop-color="#5A251E"/>
+    </linearGradient>
+    <linearGradient id="faceF" x1="64" y1="35" x2="64" y2="84" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8D6C1"/>
+      <stop offset="1" stop-color="#F0C6AE"/>
     </linearGradient>
   </defs>
 
   <rect width="128" height="128" rx="64" fill="url(#bgF)"/>
 
   <!-- Hair back -->
-  <path d="M22 85C22 52 39 24 64 24C89 24 106 52 106 85C106 100 97 112 84 112H44C31 112 22 100 22 85Z" fill="url(#hairF)"/>
+  <path d="M20 84C20 49 38 19 64 19C90 19 108 49 108 84C108 102 98 113 82 113H46C30 113 20 102 20 84Z" fill="url(#hairF)"/>
+  <path d="M32 88C32 67 43 49 57 49C71 49 82 67 82 88" stroke="#9F5746" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
 
   <!-- Neck -->
-  <rect x="56" y="72" width="16" height="14" rx="7" fill="#F3C6AE"/>
+  <rect x="56" y="73" width="16" height="14" rx="7" fill="#EDBFA6"/>
 
   <!-- Face -->
-  <ellipse cx="64" cy="58" rx="24" ry="27" fill="#F7D2BD"/>
+  <ellipse cx="64" cy="58" rx="24" ry="27" fill="url(#faceF)"/>
+  <ellipse cx="51" cy="66" rx="4" ry="2.5" fill="#F3AFA1" opacity="0.45"/>
+  <ellipse cx="77" cy="66" rx="4" ry="2.5" fill="#F3AFA1" opacity="0.45"/>
 
   <!-- Eyes -->
-  <ellipse cx="54" cy="58" rx="5" ry="4" fill="#fff"/>
-  <ellipse cx="74" cy="58" rx="5" ry="4" fill="#fff"/>
-  <circle cx="54" cy="58" r="2" fill="#35554A"/>
-  <circle cx="74" cy="58" r="2" fill="#35554A"/>
+  <ellipse cx="54" cy="58" rx="5.5" ry="4.2" fill="#fff"/>
+  <ellipse cx="74" cy="58" rx="5.5" ry="4.2" fill="#fff"/>
+  <circle cx="54" cy="58" r="2.3" fill="#3A5D4E"/>
+  <circle cx="74" cy="58" r="2.3" fill="#3A5D4E"/>
+  <circle cx="55" cy="57" r="0.8" fill="#fff"/>
+  <circle cx="75" cy="57" r="0.8" fill="#fff"/>
 
   <!-- Brows -->
-  <path d="M49 52C51 50 56 50 59 52" stroke="#5C2A22" stroke-width="2" stroke-linecap="round"/>
-  <path d="M69 52C72 50 77 50 79 52" stroke="#5C2A22" stroke-width="2" stroke-linecap="round"/>
+  <path d="M49 52C52 49 56 49 59 51" stroke="#5D2E25" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M69 51C72 49 76 49 79 52" stroke="#5D2E25" stroke-width="2.2" stroke-linecap="round"/>
 
   <!-- Nose -->
-  <path d="M64 61V66" stroke="#DAA996" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M64 61V66" stroke="#D5A392" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M62 67C63 67.8 65 67.8 66 67" stroke="#D9AA99" stroke-width="1.2" stroke-linecap="round"/>
 
   <!-- Lips -->
-  <path d="M56 71C59 74 69 74 72 71" stroke="#E84E63" stroke-width="2" stroke-linecap="round"/>
+  <path d="M56 71.5C60 75 68 75 72 71.5" stroke="#E95667" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M59 73C61 74 67 74 69 73" stroke="#F26979" stroke-width="1.4" stroke-linecap="round"/>
 
   <!-- Hair front -->
-  <path d="M40 48C40 33 50 24 64 24C78 24 88 33 88 48C82 44 74 43 66 45C57 47 49 49 40 48Z" fill="#6D3027"/>
+  <path d="M39 48C39 31 50 22 64 22C78 22 89 31 89 48C83 43 74 42 66 44C57 46 49 49 39 48Z" fill="#6A2E26"/>
+  <path d="M54 31C58 26 66 24 73 27" stroke="#A75F4D" stroke-width="2" stroke-linecap="round" opacity="0.55"/>
 
   <!-- Shoulders / top -->
-  <path d="M35 112C37 97 48 88 64 88C80 88 91 97 93 112" fill="#F25B52"/>
+  <path d="M35 112C37 97 48 88 64 88C80 88 91 97 93 112" fill="#F25D55"/>
 </svg>
