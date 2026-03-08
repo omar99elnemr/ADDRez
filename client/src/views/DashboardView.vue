@@ -79,10 +79,8 @@ const donutTotal = computed(() => {
 })
 
 function donutArc(start: number, end: number): string {
-  const r = 15.9155
-  const circumference = 100
   const length = end - start
-  return `${length} ${circumference - length}`
+  return `${length} ${100 - length}`
 }
 
 // ── Today reservations sorting ──
@@ -394,10 +392,10 @@ function sortIcon(col: string): string {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="r in sortedTodayReservations" :key="r.id" class="border-b transition-colors"
+              <tr v-for="r in sortedTodayReservations" :key="r.id" class="border-b" style="transition: background-color 180ms ease"
                 :style="{ borderColor: 'var(--addrez-border)' }"
-                @mouseenter="($event.currentTarget as HTMLElement).style.backgroundColor = 'var(--addrez-bg-hover)'"
-                @mouseleave="($event.currentTarget as HTMLElement).style.backgroundColor = 'transparent'">
+                onmouseenter="this.style.backgroundColor='var(--addrez-table-row-hover)'"
+                onmouseleave="this.style.backgroundColor='transparent'">
                 <td class="py-2.5 font-medium" :style="{ color: 'var(--addrez-text-primary)' }">{{ r.time }}</td>
                 <td class="py-2.5" :style="{ color: 'var(--addrez-text-secondary)' }">{{ r.confirmation_code || '—' }}</td>
                 <td class="py-2.5 font-medium" :style="{ color: 'var(--addrez-text-primary)' }">{{ r.guest_name || 'Walk-in' }}</td>

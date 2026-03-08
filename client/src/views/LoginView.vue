@@ -71,8 +71,7 @@ function quickLogin(u: string) {
               required
               autofocus
               placeholder="Enter your username"
-              class="w-full px-4 py-2.5 rounded-lg border text-sm outline-none transition-colors"
-              :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }"
+              class="input px-4 py-2.5"
             />
           </div>
 
@@ -84,8 +83,7 @@ function quickLogin(u: string) {
                 :type="showPassword ? 'text' : 'password'"
                 required
                 placeholder="Enter your password"
-                class="w-full px-4 py-2.5 pr-10 rounded-lg border text-sm outline-none transition-colors"
-                :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }"
+                class="input px-4 py-2.5 !pr-10"
               />
               <button
                 type="button"

@@ -1,38 +1,71 @@
 @import "tailwindcss";
 @import "primeicons/primeicons.css";
 
-/* ── ADDRez Design Tokens ── */
+/* ══════════════════════════════════════════
+   ADDRez Design System
+   ══════════════════════════════════════════ */
+
+/* ── Design Tokens ── */
 :root {
   --addrez-gold: #d4a853;
   --addrez-gold-light: #e8c67a;
   --addrez-gold-dark: #b08a3e;
+  --addrez-radius-sm: 6px;
+  --addrez-radius-md: 8px;
+  --addrez-radius-lg: 12px;
+  --addrez-radius-xl: 16px;
+  --addrez-transition: 180ms ease;
+  --addrez-shadow-sm: 0 1px 2px rgba(0,0,0,0.06);
+  --addrez-shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --addrez-shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+  --addrez-focus-ring: 0 0 0 2px rgba(212, 168, 83, 0.4);
 }
 
 /* ── Midnight Luxury (Dark) ── */
 .theme-dark {
   --addrez-bg-primary: #0f0f14;
-  --addrez-bg-secondary: #1a1a24;
-  --addrez-bg-card: #22222e;
-  --addrez-bg-hover: #2a2a38;
-  --addrez-text-primary: #f0ece4;
-  --addrez-text-secondary: #a09c94;
-  --addrez-border: #333340;
-  --addrez-sidebar-bg: #13131a;
+  --addrez-bg-secondary: #16161e;
+  --addrez-bg-card: #1e1e2a;
+  --addrez-bg-hover: #282836;
+  --addrez-bg-elevated: #2a2a3a;
+  --addrez-text-primary: #eeeae2;
+  --addrez-text-secondary: #9b978f;
+  --addrez-text-muted: #6b6860;
+  --addrez-border: #2e2e3c;
+  --addrez-border-light: #252533;
+  --addrez-sidebar-bg: #111118;
   --addrez-sidebar-active: rgba(212, 168, 83, 0.12);
+  --addrez-input-bg: #181822;
+  --addrez-placeholder: #5e5b54;
+  --addrez-table-row-hover: rgba(212, 168, 83, 0.04);
+  --addrez-shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
+  --addrez-shadow-md: 0 4px 12px rgba(0,0,0,0.25);
+  --addrez-shadow-lg: 0 8px 24px rgba(0,0,0,0.35);
+  color-scheme: dark;
 }
 
 /* ── Golden Day (Light) — eye-care warm tones ── */
 .theme-light {
-  --addrez-bg-primary: #f7f5f0;
-  --addrez-bg-secondary: #fefdfb;
+  --addrez-bg-primary: #f5f3ee;
+  --addrez-bg-secondary: #fdfcfa;
   --addrez-bg-card: #ffffff;
   --addrez-bg-hover: #f0ece4;
+  --addrez-bg-elevated: #f8f6f1;
   --addrez-text-primary: #2c2a26;
   --addrez-text-secondary: #78756c;
-  --addrez-border: #e2ddd3;
-  --addrez-sidebar-bg: #efeae0;
+  --addrez-text-muted: #a5a29a;
+  --addrez-border: #e4dfd5;
+  --addrez-border-light: #ebe7de;
+  --addrez-sidebar-bg: #eceae2;
   --addrez-sidebar-active: rgba(180, 138, 62, 0.14);
+  --addrez-input-bg: #fdfcfa;
+  --addrez-placeholder: #b5b2aa;
+  --addrez-table-row-hover: rgba(180, 138, 62, 0.04);
+  color-scheme: light;
 }
+
+/* ── Base ── */
+*, *::before, *::after { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -40,15 +73,27 @@ body {
   background-color: var(--addrez-bg-primary);
   color: var(--addrez-text-primary);
   transition: background-color 0.3s, color 0.3s;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* ── Scrollbar styling ── */
+/* ── Selection ── */
+::selection {
+  background: rgba(212, 168, 83, 0.25);
+  color: var(--addrez-text-primary);
+}
+
+/* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--addrez-border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--addrez-gold); }
 
-/* ── Utility ── */
+/* ══════════════════════════════════════════
+   Components
+   ══════════════════════════════════════════ */
+
+/* ── Gold gradient text ── */
 .gold-gradient {
   background: linear-gradient(135deg, var(--addrez-gold), var(--addrez-gold-light));
   -webkit-background-clip: text;
@@ -56,22 +101,168 @@ body {
   background-clip: text;
 }
 
+/* ── Card ── */
 .card {
   background: var(--addrez-bg-card);
   border: 1px solid var(--addrez-border);
-  border-radius: 12px;
+  border-radius: var(--addrez-radius-lg);
   padding: 1.5rem;
+  transition: box-shadow var(--addrez-transition);
 }
 
+/* ── Primary action button ── */
 .btn-gold {
   background: linear-gradient(135deg, var(--addrez-gold), var(--addrez-gold-dark));
   color: #1a1a24;
   font-weight: 600;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--addrez-radius-md);
   padding: 0.625rem 1.25rem;
   cursor: pointer;
-  transition: opacity 0.2s, transform 0.1s;
+  transition: opacity var(--addrez-transition), transform 0.1s;
 }
 .btn-gold:hover { opacity: 0.9; }
 .btn-gold:active { transform: scale(0.98); }
+.btn-gold:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* ── Secondary / outline button ── */
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--addrez-border);
+  color: var(--addrez-text-primary);
+  font-weight: 500;
+  border-radius: var(--addrez-radius-md);
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: all var(--addrez-transition);
+}
+.btn-outline:hover { border-color: var(--addrez-gold); color: var(--addrez-gold); }
+
+/* ── Form inputs ── */
+.input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--addrez-radius-md);
+  border: 1px solid var(--addrez-border);
+  background-color: var(--addrez-input-bg);
+  color: var(--addrez-text-primary);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  outline: none;
+  transition: border-color var(--addrez-transition), box-shadow var(--addrez-transition);
+}
+.input:focus {
+  border-color: var(--addrez-gold);
+  box-shadow: var(--addrez-focus-ring);
+}
+.input::placeholder { color: var(--addrez-placeholder); }
+.input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Global placeholder color for non-.input elements */
+input::placeholder,
+textarea::placeholder,
+select::placeholder {
+  color: var(--addrez-placeholder);
+}
+
+/* Global focus ring for all form controls */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--addrez-gold);
+  box-shadow: var(--addrez-focus-ring);
+}
+
+/* ── Data tables ── */
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+.data-table thead th {
+  text-align: left;
+  padding: 0.75rem;
+  font-weight: 500;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--addrez-text-secondary);
+  border-bottom: 1px solid var(--addrez-border);
+}
+.data-table tbody td {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--addrez-border-light);
+  color: var(--addrez-text-primary);
+}
+.data-table tbody tr {
+  transition: background-color var(--addrez-transition);
+}
+.data-table tbody tr:hover {
+  background-color: var(--addrez-table-row-hover);
+}
+.data-table tbody tr:last-child td { border-bottom: none; }
+
+/* ── Badge / pill ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+/* ── Empty state ── */
+.empty-state {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--addrez-text-secondary);
+}
+.empty-state i { font-size: 2rem; margin-bottom: 0.5rem; display: block; opacity: 0.5; }
+.empty-state p { font-size: 0.875rem; margin: 0; }
+
+/* ── Section headings ── */
+.section-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--addrez-text-primary);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ── Sidebar nav accent ── */
+.nav-item-active {
+  position: relative;
+}
+.nav-item-active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 20%;
+  height: 60%;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--addrez-gold);
+}
+
+/* ── Subtle divider ── */
+.divider {
+  border: none;
+  border-top: 1px solid var(--addrez-border);
+  margin: 1rem 0;
+}
+
+/* ── Stat value ── */
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--addrez-text-primary);
+}
+.stat-label {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--addrez-text-secondary);
+  margin-top: 0.125rem;
+}

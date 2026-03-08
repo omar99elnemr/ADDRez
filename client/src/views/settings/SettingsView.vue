@@ -28,14 +28,14 @@ function isActive(path: string) {
     <h1 class="text-2xl font-bold mb-6" :style="{ color: 'var(--addrez-text-primary)' }">Settings</h1>
 
     <!-- Tabs -->
-    <div class="flex gap-1 mb-6 overflow-x-auto pb-1">
+    <div class="flex gap-0 mb-6 overflow-x-auto border-b" :style="{ borderColor: 'var(--addrez-border)' }">
       <router-link
         v-for="tab in tabs" :key="tab.to"
         :to="tab.to"
-        class="px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap no-underline transition-colors"
+        class="px-4 py-2.5 text-sm font-medium whitespace-nowrap no-underline transition-all relative"
         :style="isActive(tab.to)
-          ? { backgroundColor: 'var(--addrez-gold)', color: '#1a1a24' }
-          : { backgroundColor: 'var(--addrez-bg-card)', color: 'var(--addrez-text-secondary)' }"
+          ? { color: 'var(--addrez-gold)', borderBottom: '2px solid var(--addrez-gold)' }
+          : { color: 'var(--addrez-text-secondary)', borderBottom: '2px solid transparent' }"
       >
         {{ tab.label }}
       </router-link>

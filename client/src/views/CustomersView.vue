@@ -272,7 +272,7 @@ onMounted(() => {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="c in customers" :key="c.id" @click="viewCustomer(c.id)" class="border-t cursor-pointer transition-colors hover:bg-[var(--addrez-bg-hover)]" :style="{ borderColor: 'var(--addrez-border)' }">
+            <tr v-for="c in customers" :key="c.id" @click="viewCustomer(c.id)" class="border-t cursor-pointer" style="transition: background-color 180ms ease" :style="{ borderColor: 'var(--addrez-border)' }" onmouseenter="this.style.backgroundColor='var(--addrez-table-row-hover)'" onmouseleave="this.style.backgroundColor='transparent'">
               <td class="py-3 px-3">
                 <div class="font-medium" :style="{ color: 'var(--addrez-text-primary)' }">{{ c.full_name }}</div>
                 <div class="flex gap-1 mt-1">

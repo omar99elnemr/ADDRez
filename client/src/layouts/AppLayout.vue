@@ -133,16 +133,20 @@ function handleLogout() {
       </div>
 
       <!-- Nav -->
-      <nav class="flex-1 py-3 px-2 space-y-1 overflow-y-auto">
+      <nav class="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto">
         <router-link
           v-for="item in navItems"
           :key="item.to"
           :to="item.to"
-          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors no-underline"
-          :class="isActive(item.to)
-            ? 'text-[var(--addrez-gold)]'
-            : 'hover:bg-[var(--addrez-bg-hover)]'"
-          :style="isActive(item.to) ? { backgroundColor: 'var(--addrez-sidebar-active)' } : { color: 'var(--addrez-text-secondary)' }"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium no-underline"
+          :class="[
+            isActive(item.to)
+              ? 'nav-item-active text-[var(--addrez-gold)]'
+              : 'hover:bg-[var(--addrez-bg-hover)]'
+          ]"
+          :style="isActive(item.to)
+            ? { backgroundColor: 'var(--addrez-sidebar-active)', transition: 'all 180ms ease' }
+            : { color: 'var(--addrez-text-secondary)', transition: 'all 180ms ease' }"
         >
           <i :class="item.icon" class="text-base w-5 text-center"></i>
           <span v-if="!sidebarCollapsed">{{ item.label }}</span>
@@ -165,9 +169,13 @@ function handleLogout() {
     <div class="flex-1 flex flex-col overflow-hidden">
       <!-- Top bar -->
       <header
-        class="flex items-center justify-end h-16 px-6 border-b"
+        class="flex items-center justify-between h-14 px-6 border-b"
         :style="{ backgroundColor: 'var(--addrez-bg-secondary)', borderColor: 'var(--addrez-border)' }"
       >
+        <!-- Left: Page context -->
+        <div class="flex items-center gap-2">
+          <span class="text-sm font-medium" :style="{ color: 'var(--addrez-text-secondary)' }">{{ route.meta?.title || route.name?.toString().replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()) || '' }}</span>
+        </div>
 
         <div class="flex items-center gap-3">
           <!-- Profile dropdown -->
@@ -176,7 +184,7 @@ function handleLogout() {
               @click.stop="toggleProfileMenu"
               class="flex items-center gap-2 px-2 py-1.5 rounded-lg transition-colors hover:bg-[var(--addrez-bg-hover)] bg-transparent border-0 cursor-pointer"
             >
-              <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
+              <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shadow-sm"
                    style="background: linear-gradient(135deg, var(--addrez-gold), var(--addrez-gold-dark)); color: #1a1a24;">
                 {{ auth.user?.first_name?.charAt(0) }}{{ auth.user?.last_name?.charAt(0) }}
               </div>
