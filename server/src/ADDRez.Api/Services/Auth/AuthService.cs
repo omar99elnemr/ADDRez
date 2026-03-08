@@ -64,6 +64,7 @@ public class AuthService : IAuthService
             .IgnoreQueryFilters()
             .Include(u => u.Roles).ThenInclude(r => r.Permissions)
             .Include(u => u.Outlets)
+            .Include(u => u.Company)
             .Where(u => u.Id == userId && u.CompanyId == companyId)
             .FirstOrDefaultAsync();
     }

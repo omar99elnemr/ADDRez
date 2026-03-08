@@ -36,7 +36,7 @@ public record UpdateOutletRequest(
 public record UserListDto(
     int Id, string Username, string Email, string FirstName, string LastName,
     string FullName, string? Phone, bool IsActive, DateTime? LastLoginAt,
-    IEnumerable<string> Roles, IEnumerable<string> Branches
+    IEnumerable<string> Roles, IEnumerable<string> Outlets
 );
 public record CreateUserRequest(
     string Username, string Email, string Password, string FirstName,

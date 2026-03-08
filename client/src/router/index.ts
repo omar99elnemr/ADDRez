@@ -15,6 +15,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       { path: '', redirect: '/dashboard' },
       { path: 'dashboard', name: 'dashboard', component: () => import('@/views/DashboardView.vue'), meta: { permission: 'dashboard.view' } },
+      { path: 'profile', name: 'profile', component: () => import('@/views/ProfileView.vue') },
       { path: 'reservations', name: 'reservations', component: () => import('@/views/ReservationsView.vue'), meta: { permission: 'reservations.view' } },
       { path: 'customers', name: 'customers', component: () => import('@/views/CustomersView.vue'), meta: { permission: 'customers.view' } },
       { path: 'customers/:id', name: 'customer-detail', component: () => import('@/views/CustomerDetailView.vue'), meta: { permission: 'customers.view' } },

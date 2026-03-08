@@ -22,46 +22,6 @@ function onSidebarEnter() { if (!sidebarPinned.value) sidebarHovered.value = tru
 function onSidebarLeave() { sidebarHovered.value = false }
 
 const showProfileMenu = ref(false)
-const showPasswordDialog = ref(false)
-const passwordForm = ref({ currentPassword: '', newPassword: '', confirmPassword: '' })
-const passwordError = ref('')
-const passwordLoading = ref(false)
-const showPwCurrent = ref(false)
-const showPwNew = ref(false)
-const showPwConfirm = ref(false)
-
-const showProfileDialog = ref(false)
-const profileForm = ref({ email: '', first_name: '', last_name: '', phone: '' })
-const profileLoading = ref(false)
-const profileError = ref('')
-
-function openProfileDialog() {
-  showProfileMenu.value = false
-  profileForm.value = {
-    email: auth.user?.email || '',
-    first_name: auth.user?.first_name || '',
-    last_name: auth.user?.last_name || '',
-    phone: auth.user?.phone || ''
-  }
-  profileError.value = ''
-  showProfileDialog.value = true
-}
-
-async function saveProfile() {
-  profileError.value = ''
-  profileLoading.value = true
-  try {
-    const api = (await import('@/services/api')).default
-    const { data } = await api.put('/auth/profile', profileForm.value)
-    auth.user = data
-    localStorage.setItem('addrez_user', JSON.stringify(data))
-    showProfileDialog.value = false
-  } catch (err: any) {
-    profileError.value = err.response?.data?.message || 'Failed to update profile'
-  } finally {
-    profileLoading.value = false
-  }
-}
 
 const userRole = computed(() => auth.user?.roles?.[0]?.name ?? 'User')
 
@@ -73,32 +33,6 @@ function closeProfileMenu(e: MouseEvent) {
   const target = e.target as HTMLElement
   if (!target.closest('.profile-dropdown')) {
     showProfileMenu.value = false
-  }
-}
-
-async function changePassword() {
-  passwordError.value = ''
-  if (passwordForm.value.newPassword !== passwordForm.value.confirmPassword) {
-    passwordError.value = 'Passwords do not match'
-    return
-  }
-  if (passwordForm.value.newPassword.length < 6) {
-    passwordError.value = 'Password must be at least 6 characters'
-    return
-  }
-  passwordLoading.value = true
-  try {
-    const api = (await import('@/services/api')).default
-    await api.post('/auth/update-password', {
-      current_password: passwordForm.value.currentPassword,
-      new_password: passwordForm.value.newPassword
-    })
-    showPasswordDialog.value = false
-    passwordForm.value = { currentPassword: '', newPassword: '', confirmPassword: '' }
-  } catch (err: any) {
-    passwordError.value = err.response?.data?.message || 'Failed to change password'
-  } finally {
-    passwordLoading.value = false
   }
 }
 
@@ -225,16 +159,9 @@ function handleLogout() {
                 <div class="text-xs mt-1 px-1.5 py-0.5 rounded inline-block" style="background: var(--addrez-gold); color: #1a1a24; font-weight: 600">{{ userRole }}</div>
               </div>
               <div class="py-1">
-                <button @click="openProfileDialog" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm bg-transparent border-0 cursor-pointer transition-colors hover:bg-[var(--addrez-bg-hover)]" :style="{ color: 'var(--addrez-text-primary)' }">
-                  <i class="pi pi-user-edit w-4 text-center" :style="{ color: 'var(--addrez-text-secondary)' }"></i> Edit Profile
-                </button>
-                <button @click="showProfileMenu = false; showPasswordDialog = true" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm bg-transparent border-0 cursor-pointer transition-colors hover:bg-[var(--addrez-bg-hover)]" :style="{ color: 'var(--addrez-text-primary)' }">
-                  <i class="pi pi-lock w-4 text-center" :style="{ color: 'var(--addrez-text-secondary)' }"></i> Change Password
-                </button>
-                <button @click="showProfileMenu = false; theme.toggle()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm bg-transparent border-0 cursor-pointer transition-colors hover:bg-[var(--addrez-bg-hover)]" :style="{ color: 'var(--addrez-text-primary)' }">
-                  <i :class="theme.mode === 'dark' ? 'pi pi-sun' : 'pi pi-moon'" class="w-4 text-center" :style="{ color: 'var(--addrez-text-secondary)' }"></i>
-                  {{ theme.mode === 'dark' ? 'Light Mode' : 'Dark Mode' }}
-                </button>
+                <router-link to="/profile" @click="showProfileMenu = false" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm no-underline transition-colors hover:bg-[var(--addrez-bg-hover)]" :style="{ color: 'var(--addrez-text-primary)' }">
+                  <i class="pi pi-user w-4 text-center" :style="{ color: 'var(--addrez-text-secondary)' }"></i> My Profile
+                </router-link>
               </div>
               <div class="border-t py-1" :style="{ borderColor: 'var(--addrez-border)' }">
                 <button @click="handleLogout" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm bg-transparent border-0 cursor-pointer transition-colors hover:bg-[var(--addrez-bg-hover)]" style="color: #ef4444">
@@ -252,77 +179,5 @@ function handleLogout() {
       </main>
     </div>
 
-    <!-- Edit Profile Dialog -->
-    <div v-if="showProfileDialog" class="modal-overlay">
-      <div class="card w-full max-w-sm mx-4" :style="{ backgroundColor: 'var(--addrez-bg-card)' }">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold" :style="{ color: 'var(--addrez-text-primary)' }"><i class="pi pi-user-edit mr-2"></i>Edit Profile</h3>
-          <button @click="showProfileDialog = false" class="bg-transparent border-0 cursor-pointer" :style="{ color: 'var(--addrez-text-secondary)' }"><i class="pi pi-times"></i></button>
-        </div>
-        <div v-if="profileError" class="mb-3 p-2 rounded-lg text-xs" style="background: rgba(239,68,68,0.1); color: #ef4444">{{ profileError }}</div>
-        <form @submit.prevent="saveProfile" class="space-y-3">
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-medium mb-1" :style="{ color: 'var(--addrez-text-secondary)' }">First Name</label>
-              <input v-model="profileForm.first_name" required class="w-full px-3 py-2 rounded-lg border text-sm" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
-            </div>
-            <div>
-              <label class="block text-xs font-medium mb-1" :style="{ color: 'var(--addrez-text-secondary)' }">Last Name</label>
-              <input v-model="profileForm.last_name" required class="w-full px-3 py-2 rounded-lg border text-sm" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
-            </div>
-          </div>
-          <div>
-            <label class="block text-xs font-medium mb-1" :style="{ color: 'var(--addrez-text-secondary)' }">Email</label>
-            <input v-model="profileForm.email" type="email" required class="w-full px-3 py-2 rounded-lg border text-sm" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
-          </div>
-          <div>
-            <label class="block text-xs font-medium mb-1" :style="{ color: 'var(--addrez-text-secondary)' }">Phone</label>
-            <input v-model="profileForm.phone" class="w-full px-3 py-2 rounded-lg border text-sm" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
-          </div>
-          <div class="flex justify-end gap-2 pt-2">
-            <button type="button" @click="showProfileDialog = false" class="px-4 py-2 rounded-lg text-sm border bg-transparent cursor-pointer" :style="{ borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }">Cancel</button>
-            <button type="submit" :disabled="profileLoading" class="btn-gold text-sm px-4 py-2">{{ profileLoading ? 'Saving...' : 'Save Profile' }}</button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Change Password Dialog -->
-    <div v-if="showPasswordDialog" class="modal-overlay">
-      <div class="card w-full max-w-sm mx-4" :style="{ backgroundColor: 'var(--addrez-bg-card)' }">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold" :style="{ color: 'var(--addrez-text-primary)' }"><i class="pi pi-lock mr-2"></i>Change Password</h3>
-          <button @click="showPasswordDialog = false" class="bg-transparent border-0 cursor-pointer" :style="{ color: 'var(--addrez-text-secondary)' }"><i class="pi pi-times"></i></button>
-        </div>
-        <div v-if="passwordError" class="mb-3 p-2 rounded-lg text-xs" style="background: rgba(239,68,68,0.1); color: #ef4444">{{ passwordError }}</div>
-        <form @submit.prevent="changePassword" class="space-y-3">
-          <div>
-            <label class="block text-xs font-medium mb-1" :style="{ color: 'var(--addrez-text-secondary)' }">Current Password</label>
-            <div class="relative">
-              <input v-model="passwordForm.currentPassword" :type="showPwCurrent ? 'text' : 'password'" required class="w-full px-3 py-2 pr-9 rounded-lg border text-sm" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
-              <button type="button" @click="showPwCurrent = !showPwCurrent" tabindex="-1" class="absolute right-2.5 top-1/2 -translate-y-1/2 bg-transparent border-0 cursor-pointer p-0" :style="{ color: 'var(--addrez-text-secondary)' }"><i :class="showPwCurrent ? 'pi pi-eye-slash' : 'pi pi-eye'" class="text-xs"></i></button>
-            </div>
-          </div>
-          <div>
-            <label class="block text-xs font-medium mb-1" :style="{ color: 'var(--addrez-text-secondary)' }">New Password</label>
-            <div class="relative">
-              <input v-model="passwordForm.newPassword" :type="showPwNew ? 'text' : 'password'" required class="w-full px-3 py-2 pr-9 rounded-lg border text-sm" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
-              <button type="button" @click="showPwNew = !showPwNew" tabindex="-1" class="absolute right-2.5 top-1/2 -translate-y-1/2 bg-transparent border-0 cursor-pointer p-0" :style="{ color: 'var(--addrez-text-secondary)' }"><i :class="showPwNew ? 'pi pi-eye-slash' : 'pi pi-eye'" class="text-xs"></i></button>
-            </div>
-          </div>
-          <div>
-            <label class="block text-xs font-medium mb-1" :style="{ color: 'var(--addrez-text-secondary)' }">Confirm Password</label>
-            <div class="relative">
-              <input v-model="passwordForm.confirmPassword" :type="showPwConfirm ? 'text' : 'password'" required class="w-full px-3 py-2 pr-9 rounded-lg border text-sm" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
-              <button type="button" @click="showPwConfirm = !showPwConfirm" tabindex="-1" class="absolute right-2.5 top-1/2 -translate-y-1/2 bg-transparent border-0 cursor-pointer p-0" :style="{ color: 'var(--addrez-text-secondary)' }"><i :class="showPwConfirm ? 'pi pi-eye-slash' : 'pi pi-eye'" class="text-xs"></i></button>
-            </div>
-          </div>
-          <div class="flex justify-end gap-2 pt-2">
-            <button type="button" @click="showPasswordDialog = false" class="px-4 py-2 rounded-lg text-sm border bg-transparent cursor-pointer" :style="{ borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }">Cancel</button>
-            <button type="submit" :disabled="passwordLoading" class="btn-gold text-sm px-4 py-2">{{ passwordLoading ? 'Saving...' : 'Update Password' }}</button>
-          </div>
-        </form>
-      </div>
-    </div>
   </div>
 </template>
