@@ -15,11 +15,12 @@ const canvasBg = computed(() => theme.mode === 'dark' ? '#1a1f2e' : '#e9edf2')
 // ── Outlet selector ──
 const showOutletDropdown = ref(false)
 const outletName = computed(() => {
-  if (!auth.user) return ''
-  const b = auth.user.outlets.find(o => o.id === auth.currentOutletId)
-  return b?.name ?? auth.user.outlets[0]?.name ?? 'Outlet'
+  // Prefer fresh API data, fall back to auth cache
+  const outlets = allOutlets.value.length > 0 ? allOutlets.value : (auth.user?.outlets ?? [])
+  const b = outlets.find(o => o.id === auth.currentOutletId)
+  return b?.name ?? outlets[0]?.name ?? 'Outlet'
 })
-const userOutlets = computed(() => auth.user?.outlets ?? [])
+const userOutlets = computed(() => allOutlets.value.length > 0 ? allOutlets.value : (auth.user?.outlets ?? []))
 
 function switchOutlet(outletId: number) {
   auth.setOutlet(outletId)
@@ -156,6 +157,7 @@ async function loadReservations() {
 
 async function loadAll() {
   loading.value = true
+  auth.refreshUser()
   try {
     const [slotRes, tagRes, catRes, outletRes, layoutRes] = await Promise.all([
       api.get<TimeSlot[]>('/time-slots'),
@@ -448,118 +450,118 @@ onMounted(loadAll)
 
           <!-- === Right panel: Create Reservation Form === -->
           <template v-else>
-            <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center justify-between mb-4">
               <h2 class="text-lg font-semibold" style="color: #0ea5e9">
                 <i class="pi pi-calendar-plus mr-1"></i>{{ selectedTable ? `Reserve ${selectedTable.name}` : 'New Reservation' }}
               </h2>
-              <button @click="cancelCreate" class="p-1.5 rounded bg-transparent border-0 cursor-pointer" :style="{ color: 'var(--addrez-text-secondary)' }"><i class="pi pi-times"></i></button>
+              <button @click="cancelCreate" class="p-2 rounded bg-transparent border-0 cursor-pointer" :style="{ color: 'var(--addrez-text-secondary)' }"><i class="pi pi-times text-lg"></i></button>
             </div>
 
             <!-- Table info -->
-            <div v-if="selectedTable" class="rounded-lg p-2 mb-3 flex items-center gap-2" :style="{ backgroundColor: 'var(--addrez-bg-primary)', border: '1px solid var(--addrez-gold)' }">
+            <div v-if="selectedTable" class="rounded-lg p-3 mb-4 flex items-center gap-2" :style="{ backgroundColor: 'var(--addrez-bg-primary)', border: '1px solid var(--addrez-gold)' }">
               <i class="pi pi-th-large" style="color: var(--addrez-gold)"></i>
-              <div class="text-xs"><span class="font-semibold" :style="{ color: 'var(--addrez-text-primary)' }">{{ selectedTable.label || selectedTable.name }}</span> · {{ selectedTable.min_covers }}-{{ selectedTable.max_covers }} covers</div>
+              <div class="text-sm"><span class="font-semibold" :style="{ color: 'var(--addrez-text-primary)' }">{{ selectedTable.label || selectedTable.name }}</span> · {{ selectedTable.min_covers }}-{{ selectedTable.max_covers }} covers</div>
             </div>
 
             <div class="flex-1 overflow-y-auto" style="max-height: calc(100vh - 260px)">
-              <form @submit.prevent="createReservation" class="space-y-2">
+              <form @submit.prevent="createReservation" class="space-y-3">
                 <!-- Guest search -->
                 <div class="relative">
-                  <label class="block text-[10px] font-medium mb-0.5 uppercase tracking-wider" :style="{ color: 'var(--addrez-text-secondary)' }">Search Guest</label>
+                  <label class="block text-xs font-medium mb-1" :style="{ color: 'var(--addrez-text-secondary)' }">Search Guest</label>
                   <div class="flex gap-1">
-                    <input v-model="guestQuery" @input="searchGuests" placeholder="Name or phone..." class="w-full px-2 py-1.5 rounded-lg border text-xs" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: selectedGuest ? 'var(--addrez-gold)' : 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
-                    <button v-if="selectedGuest" type="button" @click="clearGuest" class="px-1 rounded border-0 bg-transparent cursor-pointer" :style="{ color: 'var(--addrez-text-secondary)' }"><i class="pi pi-times text-xs"></i></button>
+                    <input v-model="guestQuery" @input="searchGuests" placeholder="Name or phone..." class="w-full px-3 py-2 rounded-lg border text-sm" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: selectedGuest ? 'var(--addrez-gold)' : 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
+                    <button v-if="selectedGuest" type="button" @click="clearGuest" class="px-2 rounded border-0 bg-transparent cursor-pointer" :style="{ color: 'var(--addrez-text-secondary)' }"><i class="pi pi-times text-sm"></i></button>
                   </div>
-                  <div v-if="selectedGuest" class="mt-0.5 text-[10px]" style="color: var(--addrez-gold)"><i class="pi pi-user-plus mr-0.5"></i>{{ selectedGuest.fullName }}</div>
+                  <div v-if="selectedGuest" class="mt-1 text-xs" style="color: var(--addrez-gold)"><i class="pi pi-user-plus mr-0.5"></i>{{ selectedGuest.fullName }}</div>
                   <div v-if="showGuestResults && guestResults.length" class="absolute z-10 w-full mt-1 rounded-lg border shadow-lg overflow-hidden" :style="{ backgroundColor: 'var(--addrez-bg-card)', borderColor: 'var(--addrez-border)' }">
-                    <div v-for="g in guestResults" :key="g.id" @click="selectGuest(g)" class="px-3 py-2 cursor-pointer" :style="{ borderBottom: '1px solid var(--addrez-border)' }">
-                      <div class="text-xs font-medium" :style="{ color: 'var(--addrez-text-primary)' }">{{ g.fullName }}</div>
-                      <div class="text-[10px]" :style="{ color: 'var(--addrez-text-secondary)' }">{{ g.phone || '' }}</div>
+                    <div v-for="g in guestResults" :key="g.id" @click="selectGuest(g)" class="px-3 py-2.5 cursor-pointer" :style="{ borderBottom: '1px solid var(--addrez-border)' }">
+                      <div class="text-sm font-medium" :style="{ color: 'var(--addrez-text-primary)' }">{{ g.fullName }}</div>
+                      <div class="text-xs" :style="{ color: 'var(--addrez-text-secondary)' }">{{ g.phone || '' }}</div>
                     </div>
                   </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-2 gap-3">
                   <div>
-                    <label class="block text-[10px] font-medium mb-0.5 uppercase tracking-wider" :style="{ color: 'var(--addrez-text-secondary)' }">Name *</label>
-                    <input v-model="form.guest_name" required class="w-full px-2 py-1.5 rounded-lg border text-xs" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
+                    <label class="block text-xs font-medium mb-1" :style="{ color: 'var(--addrez-text-secondary)' }">Name *</label>
+                    <input v-model="form.guest_name" required class="w-full px-3 py-2 rounded-lg border text-sm" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
                   </div>
                   <div>
-                    <label class="block text-[10px] font-medium mb-0.5 uppercase tracking-wider" :style="{ color: 'var(--addrez-text-secondary)' }">Mobile *</label>
-                    <input v-model="form.guest_phone" required class="w-full px-2 py-1.5 rounded-lg border text-xs" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
+                    <label class="block text-xs font-medium mb-1" :style="{ color: 'var(--addrez-text-secondary)' }">Mobile *</label>
+                    <input v-model="form.guest_phone" required class="w-full px-3 py-2 rounded-lg border text-sm" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
                   </div>
                   <div>
-                    <label class="block text-[10px] font-medium mb-0.5 uppercase tracking-wider" :style="{ color: 'var(--addrez-text-secondary)' }">Email</label>
-                    <input v-model="form.guest_email" type="email" class="w-full px-2 py-1.5 rounded-lg border text-xs" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
+                    <label class="block text-xs font-medium mb-1" :style="{ color: 'var(--addrez-text-secondary)' }">Email</label>
+                    <input v-model="form.guest_email" type="email" class="w-full px-3 py-2 rounded-lg border text-sm" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
                   </div>
                   <div>
-                    <label class="block text-[10px] font-medium mb-0.5 uppercase tracking-wider" :style="{ color: 'var(--addrez-text-secondary)' }">Gender *</label>
-                    <select v-model="form.guest_gender" required class="w-full px-2 py-1.5 rounded-lg border text-xs" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }">
+                    <label class="block text-xs font-medium mb-1" :style="{ color: 'var(--addrez-text-secondary)' }">Gender *</label>
+                    <select v-model="form.guest_gender" required class="w-full px-3 py-2 rounded-lg border text-sm" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }">
                       <option value="" disabled>Select</option><option value="Male">Male</option><option value="Female">Female</option>
                     </select>
                   </div>
                   <div>
-                    <label class="block text-[10px] font-medium mb-0.5 uppercase tracking-wider" :style="{ color: 'var(--addrez-text-secondary)' }">Date *</label>
-                    <input v-model="form.date" type="date" required class="w-full px-2 py-1.5 rounded-lg border text-xs" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
+                    <label class="block text-xs font-medium mb-1" :style="{ color: 'var(--addrez-text-secondary)' }">Date *</label>
+                    <input v-model="form.date" type="date" required class="w-full px-3 py-2 rounded-lg border text-sm" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
                   </div>
                   <div>
-                    <label class="block text-[10px] font-medium mb-0.5 uppercase tracking-wider" :style="{ color: 'var(--addrez-text-secondary)' }">Time *</label>
-                    <input v-model="form.time" type="time" required class="w-full px-2 py-1.5 rounded-lg border text-xs" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
+                    <label class="block text-xs font-medium mb-1" :style="{ color: 'var(--addrez-text-secondary)' }">Time *</label>
+                    <input v-model="form.time" type="time" required class="w-full px-3 py-2 rounded-lg border text-sm" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
                   </div>
                   <div>
-                    <label class="block text-[10px] font-medium mb-0.5 uppercase tracking-wider" :style="{ color: 'var(--addrez-text-secondary)' }">Covers *</label>
-                    <input v-model.number="form.covers" type="number" min="1" required class="w-full px-2 py-1.5 rounded-lg border text-xs" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
+                    <label class="block text-xs font-medium mb-1" :style="{ color: 'var(--addrez-text-secondary)' }">Covers *</label>
+                    <input v-model.number="form.covers" type="number" min="1" required class="w-full px-3 py-2 rounded-lg border text-sm" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
                   </div>
                   <div>
-                    <label class="block text-[10px] font-medium mb-0.5 uppercase tracking-wider" :style="{ color: 'var(--addrez-text-secondary)' }">Duration</label>
-                    <input v-model.number="form.duration_minutes" type="number" min="15" step="15" class="w-full px-2 py-1.5 rounded-lg border text-xs" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
+                    <label class="block text-xs font-medium mb-1" :style="{ color: 'var(--addrez-text-secondary)' }">Duration</label>
+                    <input v-model.number="form.duration_minutes" type="number" min="15" step="15" class="w-full px-3 py-2 rounded-lg border text-sm" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
                   </div>
                   <div>
-                    <label class="block text-[10px] font-medium mb-0.5 uppercase tracking-wider" :style="{ color: 'var(--addrez-text-secondary)' }">Time Slot</label>
-                    <select v-model="form.time_slot_id" class="w-full px-2 py-1.5 rounded-lg border text-xs" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }">
+                    <label class="block text-xs font-medium mb-1" :style="{ color: 'var(--addrez-text-secondary)' }">Time Slot</label>
+                    <select v-model="form.time_slot_id" class="w-full px-3 py-2 rounded-lg border text-sm" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }">
                       <option :value="null">None</option>
                       <option v-for="ts in timeSlots" :key="ts.id" :value="ts.id">{{ ts.name }}</option>
                     </select>
                   </div>
                   <div>
-                    <label class="block text-[10px] font-medium mb-0.5 uppercase tracking-wider" :style="{ color: 'var(--addrez-text-secondary)' }">Seating</label>
+                    <label class="block text-xs font-medium mb-1" :style="{ color: 'var(--addrez-text-secondary)' }">Seating</label>
                     <div class="flex gap-1">
-                      <button type="button" @click="form.seating_type = 'Seated'" class="flex-1 px-2 py-1.5 rounded-lg text-[10px] border cursor-pointer"
+                      <button type="button" @click="form.seating_type = 'Seated'" class="flex-1 px-3 py-2 rounded-lg text-xs font-medium border cursor-pointer"
                         :style="form.seating_type === 'Seated' ? { backgroundColor: 'var(--addrez-gold)', color: '#1a1a24', borderColor: 'var(--addrez-gold)' } : { backgroundColor: 'transparent', color: 'var(--addrez-text-secondary)', borderColor: 'var(--addrez-border)' }">Seated</button>
-                      <button type="button" @click="form.seating_type = 'Standing'" class="flex-1 px-2 py-1.5 rounded-lg text-[10px] border cursor-pointer"
+                      <button type="button" @click="form.seating_type = 'Standing'" class="flex-1 px-3 py-2 rounded-lg text-xs font-medium border cursor-pointer"
                         :style="form.seating_type === 'Standing' ? { backgroundColor: '#8b5cf6', color: '#fff', borderColor: '#8b5cf6' } : { backgroundColor: 'transparent', color: 'var(--addrez-text-secondary)', borderColor: 'var(--addrez-border)' }">Standing</button>
                     </div>
                   </div>
                   <div>
-                    <label class="block text-[10px] font-medium mb-0.5 uppercase tracking-wider" :style="{ color: 'var(--addrez-text-secondary)' }">Type</label>
-                    <select v-model="form.type" class="w-full px-2 py-1.5 rounded-lg border text-xs" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }">
+                    <label class="block text-xs font-medium mb-1" :style="{ color: 'var(--addrez-text-secondary)' }">Type</label>
+                    <select v-model="form.type" class="w-full px-3 py-2 rounded-lg border text-sm" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }">
                       <option value="DineIn">Dine In</option><option value="Event">Event</option><option value="Birthday">Birthday</option>
                       <option value="Corporate">Corporate</option><option value="Group">Group</option><option value="PrivateDining">Private Dining</option>
                       <option value="Lounge">Lounge</option><option value="Takeaway">Takeaway</option><option value="Inhouse">Inhouse</option>
                     </select>
                   </div>
                   <div>
-                    <label class="block text-[10px] font-medium mb-0.5 uppercase tracking-wider" :style="{ color: 'var(--addrez-text-secondary)' }">Source</label>
-                    <select v-model="form.method" class="w-full px-2 py-1.5 rounded-lg border text-xs" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }">
+                    <label class="block text-xs font-medium mb-1" :style="{ color: 'var(--addrez-text-secondary)' }">Source</label>
+                    <select v-model="form.method" class="w-full px-3 py-2 rounded-lg border text-sm" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }">
                       <option value="Phone">Phone</option><option value="WalkIn">Walk-in</option><option value="Online">Online</option>
                       <option value="Email">Email</option><option value="ThirdParty">Third Party</option><option value="SocialMedia">Social Media</option>
                     </select>
                   </div>
                   <div>
-                    <label class="block text-[10px] font-medium mb-0.5 uppercase tracking-wider" :style="{ color: 'var(--addrez-text-secondary)' }">Deposit</label>
-                    <input v-model.number="form.deposit_amount" type="number" min="0" step="0.01" class="w-full px-2 py-1.5 rounded-lg border text-xs" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
+                    <label class="block text-xs font-medium mb-1" :style="{ color: 'var(--addrez-text-secondary)' }">Deposit</label>
+                    <input v-model.number="form.deposit_amount" type="number" min="0" step="0.01" class="w-full px-3 py-2 rounded-lg border text-sm" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
                   </div>
                   <div>
-                    <label class="block text-[10px] font-medium mb-0.5 uppercase tracking-wider" :style="{ color: 'var(--addrez-text-secondary)' }">DOB</label>
-                    <input v-model="form.guest_date_of_birth" type="date" class="w-full px-2 py-1.5 rounded-lg border text-xs" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
+                    <label class="block text-xs font-medium mb-1" :style="{ color: 'var(--addrez-text-secondary)' }">DOB</label>
+                    <input v-model="form.guest_date_of_birth" type="date" class="w-full px-3 py-2 rounded-lg border text-sm" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
                   </div>
                 </div>
                 <!-- Tags -->
                 <div v-if="allTags.length">
-                  <label class="block text-[10px] font-medium mb-0.5 uppercase tracking-wider" :style="{ color: 'var(--addrez-text-secondary)' }">Tags</label>
-                  <div class="flex flex-wrap gap-1">
+                  <label class="block text-xs font-medium mb-1" :style="{ color: 'var(--addrez-text-secondary)' }">Tags</label>
+                  <div class="flex flex-wrap gap-1.5">
                     <button v-for="tag in allTags" :key="tag.id" type="button" @click="toggleTag(tag.id)"
-                      class="px-1.5 py-0.5 rounded-full text-[10px] font-medium border cursor-pointer"
+                      class="px-2.5 py-1 rounded-full text-xs font-medium border cursor-pointer"
                       :style="form.tag_ids.includes(tag.id) ? { backgroundColor: tag.color + '25', borderColor: tag.color, color: tag.color } : { backgroundColor: 'transparent', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-secondary)' }">
                       {{ tag.name }}
                     </button>
@@ -567,12 +569,12 @@ onMounted(loadAll)
                 </div>
                 <!-- Notes -->
                 <div>
-                  <label class="block text-[10px] font-medium mb-0.5 uppercase tracking-wider" :style="{ color: 'var(--addrez-text-secondary)' }">Notes</label>
-                  <textarea v-model="form.notes" rows="2" class="w-full px-2 py-1.5 rounded-lg border text-xs resize-none" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }"></textarea>
+                  <label class="block text-xs font-medium mb-1" :style="{ color: 'var(--addrez-text-secondary)' }">Notes</label>
+                  <textarea v-model="form.notes" rows="3" class="w-full px-3 py-2 rounded-lg border text-sm resize-none" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }"></textarea>
                 </div>
-                <div class="flex gap-2 pt-1">
-                  <button type="button" @click="cancelCreate" class="flex-1 px-3 py-2 rounded-lg text-xs border bg-transparent cursor-pointer" :style="{ borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }">Cancel</button>
-                  <button type="submit" :disabled="saving" class="flex-1 btn-gold text-xs">{{ saving ? 'Creating...' : 'Create' }}</button>
+                <div class="flex gap-2 pt-2">
+                  <button type="button" @click="cancelCreate" class="flex-1 px-4 py-2.5 rounded-lg text-sm border bg-transparent cursor-pointer font-medium" :style="{ borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }">Cancel</button>
+                  <button type="submit" :disabled="saving" class="flex-1 btn-gold text-sm">{{ saving ? 'Creating...' : 'Create Reservation' }}</button>
                 </div>
               </form>
             </div>

@@ -55,6 +55,14 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.setItem('addrez_outlet_id', String(outletId))
   }
 
+  async function refreshUser() {
+    try {
+      const { data } = await api.get<User>('/auth/me')
+      user.value = data
+      localStorage.setItem('addrez_user', JSON.stringify(data))
+    } catch { /* silent — will use cached data */ }
+  }
+
   function logout() {
     token.value = null
     user.value = null
@@ -72,6 +80,6 @@ export const useAuthStore = defineStore('auth', () => {
 
   return {
     user, token, isAuthenticated, permissions, currentOutletId,
-    init, login, logout, setOutlet, hasPermission
+    init, login, logout, setOutlet, hasPermission, refreshUser
   }
 })
