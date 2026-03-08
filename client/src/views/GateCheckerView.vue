@@ -67,8 +67,8 @@ function reset() {
         <input
           v-model="code"
           placeholder="e.g. ADR-12345"
-          class="flex-1 px-4 py-3 rounded-lg border text-sm text-center font-mono tracking-wider"
-          :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)', fontSize: '1.1rem' }"
+          class="input flex-1 px-4 py-3 text-center font-mono tracking-wider"
+          style="font-size: 1.1rem"
           @keyup.enter="lookup"
           autofocus
         />

@@ -37,9 +37,9 @@ onMounted(loadSummary)
     <div class="card mb-4">
       <div class="flex gap-3 items-center">
         <label class="text-sm" :style="{ color: 'var(--addrez-text-secondary)' }">From:</label>
-        <input v-model="dateFrom" type="date" class="px-3 py-2 rounded-lg border text-sm" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
+        <input v-model="dateFrom" type="date" class="input px-3 py-2" />
         <label class="text-sm" :style="{ color: 'var(--addrez-text-secondary)' }">To:</label>
-        <input v-model="dateTo" type="date" class="px-3 py-2 rounded-lg border text-sm" :style="{ backgroundColor: 'var(--addrez-bg-primary)', borderColor: 'var(--addrez-border)', color: 'var(--addrez-text-primary)' }" />
+        <input v-model="dateTo" type="date" class="input px-3 py-2" />
         <button class="btn-gold text-sm" @click="loadSummary">Apply</button>
       </div>
     </div>
