@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed, watch, nextTick } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
@@ -11,6 +11,34 @@ const auth = useAuthStore()
 const theme = useThemeStore()
 
 const canvasBg = computed(() => theme.mode === 'dark' ? '#1a1f2e' : '#e9edf2')
+
+// ── Auto-fit canvas scaling ──
+const mapContainerRef = ref<HTMLElement | null>(null)
+const mapContainerWidth = ref(600)
+let mapResizeObserver: ResizeObserver | null = null
+
+const mapScale = computed(() => {
+  if (!activeFloorPlan.value) return 1
+  const cw = activeFloorPlan.value.width
+  const ch = activeFloorPlan.value.height
+  const availW = mapContainerWidth.value
+  const maxH = Math.max(300, window.innerHeight - 280)
+  const scaleW = availW / cw
+  const scaleH = maxH / ch
+  return Math.min(scaleW, scaleH, 1)
+})
+
+function initMapResize() {
+  if (mapContainerRef.value) {
+    mapContainerWidth.value = mapContainerRef.value.clientWidth
+    mapResizeObserver = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        mapContainerWidth.value = entry.contentRect.width
+      }
+    })
+    mapResizeObserver.observe(mapContainerRef.value)
+  }
+}
 
 // ── Outlet selector ──
 const showOutletDropdown = ref(false)
@@ -273,7 +301,8 @@ watch(timeSlotFilter, () => { loadReservations(); loadCapacity() })
 watch(dateFilter, () => { loadReservations() })
 watch(slotScope, () => { loadReservations() })
 
-onMounted(loadAll)
+onMounted(() => { loadAll(); nextTick(initMapResize) })
+onBeforeUnmount(() => { mapResizeObserver?.disconnect() })
 </script>
 
 <template>
@@ -332,7 +361,7 @@ onMounted(loadAll)
         <!-- ── Left: Map canvas + metrics ── -->
         <div class="flex-1 min-w-0 flex flex-col">
           <template v-if="currentLayout && activeFloorPlan">
-            <div class="rounded-xl border overflow-hidden relative" :style="{ borderColor: 'var(--addrez-border)', backgroundColor: canvasBg, maxHeight: '420px' }">
+            <div ref="mapContainerRef" class="rounded-xl border overflow-hidden relative" :style="{ borderColor: 'var(--addrez-border)', backgroundColor: canvasBg }">
               <!-- Area selector overlay -->
               <div v-if="floorPlanAreas.length > 1" class="absolute top-3 left-3 z-10">
                 <select :value="activeFloorPlanIdx" @change="activeFloorPlanIdx = Number(($event.target as HTMLSelectElement).value)"
@@ -341,20 +370,22 @@ onMounted(loadAll)
                   <option v-for="(fp, idx) in floorPlanAreas" :key="fp.id" :value="idx" :style="{ color: 'var(--addrez-text-primary)', backgroundColor: 'var(--addrez-bg-card)' }">{{ fp.name }}</option>
                 </select>
               </div>
-              <!-- Canvas (scaled to fit) -->
-              <div class="relative mx-auto" :style="{ width: activeFloorPlan.width + 'px', height: activeFloorPlan.height + 'px', maxWidth: '100%', transform: `scale(${Math.min(1, 420 / activeFloorPlan.height)})`, transformOrigin: 'top center' }">
-                <!-- Tables -->
-                <div v-for="table in activeFloorPlan.tables" :key="table.id" :style="getTableStyle(table)"
-                  :title="`${table.name} (${table.min_covers}-${table.max_covers})${table.current_reservation_guest ? '\n' + table.current_reservation_guest : ''}${!table.current_status ? '\nClick to reserve' : ''}`"
-                  @click="openReserveFromTable(table)">
-                  <span class="text-sm font-bold leading-tight" :style="{ color: table.current_status ? mapStatusColors[table.current_status] : 'var(--addrez-text-primary)' }">{{ table.label || table.name }}</span>
-                  <span class="text-xs leading-tight" :style="{ color: 'var(--addrez-text-secondary)' }">{{ table.max_covers }}</span>
-                  <span v-if="table.current_reservation_guest" class="text-[10px] mt-0.5 leading-tight" :style="{ color: mapStatusColors[table.current_status!] }">{{ table.current_reservation_guest }}</span>
-                </div>
-                <!-- Landmarks -->
-                <div v-for="lm in activeFloorPlan.landmarks" :key="lm.id" class="absolute flex items-center justify-center"
-                  :style="{ left: lm.x+'px', top: lm.y+'px', width: lm.width+'px', height: lm.height+'px', transform: `rotate(${lm.rotation}deg)`, border: '2px solid #64748b90', borderRadius: '6px', backgroundColor: '#64748b20' }">
-                  <span class="text-xs font-semibold" style="color: #64748b">{{ lm.name }}</span>
+              <!-- Canvas (auto-fit to container) -->
+              <div :style="{ width: (activeFloorPlan.width * mapScale) + 'px', height: (activeFloorPlan.height * mapScale) + 'px', overflow: 'hidden' }">
+                <div class="relative" :style="{ width: activeFloorPlan.width + 'px', height: activeFloorPlan.height + 'px', transform: `scale(${mapScale})`, transformOrigin: 'top left' }">
+                  <!-- Tables -->
+                  <div v-for="table in activeFloorPlan.tables" :key="table.id" :style="getTableStyle(table)"
+                    :title="`${table.name} (${table.min_covers}-${table.max_covers})${table.current_reservation_guest ? '\n' + table.current_reservation_guest : ''}${!table.current_status ? '\nClick to reserve' : ''}`"
+                    @click="openReserveFromTable(table)">
+                    <span class="text-sm font-bold leading-tight" :style="{ color: table.current_status ? mapStatusColors[table.current_status] : 'var(--addrez-text-primary)' }">{{ table.label || table.name }}</span>
+                    <span class="text-xs leading-tight" :style="{ color: 'var(--addrez-text-secondary)' }">{{ table.max_covers }}</span>
+                    <span v-if="table.current_reservation_guest" class="text-[10px] mt-0.5 leading-tight" :style="{ color: mapStatusColors[table.current_status!] }">{{ table.current_reservation_guest }}</span>
+                  </div>
+                  <!-- Landmarks -->
+                  <div v-for="lm in activeFloorPlan.landmarks" :key="lm.id" class="absolute flex items-center justify-center"
+                    :style="{ left: lm.x+'px', top: lm.y+'px', width: lm.width+'px', height: lm.height+'px', transform: `rotate(${lm.rotation}deg)`, border: '2px solid #64748b90', borderRadius: '6px', backgroundColor: '#64748b20' }">
+                    <span class="text-xs font-semibold" style="color: #64748b">{{ lm.name }}</span>
+                  </div>
                 </div>
               </div>
             </div>

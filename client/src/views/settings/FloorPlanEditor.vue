@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, onBeforeUnmount, nextTick } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import { useThemeStore } from '@/stores/theme'
 import api from '@/services/api'
@@ -43,6 +43,34 @@ const dragState = ref<{ objKey: string; offsetX: number; offsetY: number } | nul
 const resizeState = ref<{ objKey: string; startW: number; startH: number; startX: number; startY: number } | null>(null)
 const selectionBox = ref<{ x1: number; y1: number; x2: number; y2: number } | null>(null)
 const canvasRef = ref<HTMLElement | null>(null)
+const editorContainerRef = ref<HTMLElement | null>(null)
+const editorContainerWidth = ref(800)
+let editorResizeObserver: ResizeObserver | null = null
+
+const canvasScale = computed(() => {
+  const cw = activeFloor.value?.width || 1200
+  const ch = activeFloor.value?.height || 800
+  const availW = editorContainerWidth.value
+  const maxH = Math.max(400, window.innerHeight - 260)
+  return Math.min(availW / cw, maxH / ch, 1)
+})
+
+function initEditorResize() {
+  if (editorContainerRef.value) {
+    editorContainerWidth.value = editorContainerRef.value.clientWidth
+    editorResizeObserver = new ResizeObserver(entries => {
+      for (const entry of entries) editorContainerWidth.value = entry.contentRect.width
+    })
+    editorResizeObserver.observe(editorContainerRef.value)
+  }
+}
+
+function screenToCanvas(clientX: number, clientY: number) {
+  const rect = canvasRef.value!.getBoundingClientRect()
+  const s = canvasScale.value
+  return { x: (clientX - rect.left) / s, y: (clientY - rect.top) / s }
+}
+
 const showObjDialog = ref(false)
 const editingObj = ref<EditorObject | null>(null)
 let justBoxSelected = false
@@ -272,14 +300,14 @@ function startDrag(o: EditorObject, i: number, e: MouseEvent) {
     selectedIds.value.clear()
     selectedIds.value.add(key)
   }
-  const rect = canvasRef.value!.getBoundingClientRect()
-  dragState.value = { objKey: key, offsetX: e.clientX - rect.left - o.x, offsetY: e.clientY - rect.top - o.y }
+  const start = screenToCanvas(e.clientX, e.clientY)
+  dragState.value = { objKey: key, offsetX: start.x - o.x, offsetY: start.y - o.y }
 
   const onMove = (ev: MouseEvent) => {
     if (!dragState.value) return
-    const r = canvasRef.value!.getBoundingClientRect()
-    let nx = Math.max(0, ev.clientX - r.left - dragState.value.offsetX)
-    let ny = Math.max(0, ev.clientY - r.top - dragState.value.offsetY)
+    const pos = screenToCanvas(ev.clientX, ev.clientY)
+    let nx = Math.max(0, pos.x - dragState.value.offsetX)
+    let ny = Math.max(0, pos.y - dragState.value.offsetY)
     nx = snapValue(nx)
     ny = snapValue(ny)
     const dx = nx - o.x
@@ -300,11 +328,12 @@ function startDrag(o: EditorObject, i: number, e: MouseEvent) {
 function startResize(o: EditorObject, i: number, e: MouseEvent) {
   e.preventDefault()
   e.stopPropagation()
+  const s = canvasScale.value
   resizeState.value = { objKey: objKey(o, i), startW: o.width, startH: o.height, startX: e.clientX, startY: e.clientY }
   const onMove = (ev: MouseEvent) => {
     if (!resizeState.value) return
-    o.width = Math.max(30, resizeState.value.startW + (ev.clientX - resizeState.value.startX))
-    o.height = Math.max(20, resizeState.value.startH + (ev.clientY - resizeState.value.startY))
+    o.width = Math.max(30, resizeState.value.startW + (ev.clientX - resizeState.value.startX) / s)
+    o.height = Math.max(20, resizeState.value.startH + (ev.clientY - resizeState.value.startY) / s)
   }
   const onUp = () => { resizeState.value = null; document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp) }
   document.addEventListener('mousemove', onMove)
@@ -316,18 +345,17 @@ function startSelectionBox(e: MouseEvent) {
   const target = e.target as HTMLElement
   if (target !== canvasRef.value && target.parentElement !== canvasRef.value) return
   e.preventDefault()
-  const rect = canvasRef.value!.getBoundingClientRect()
-  const x1 = e.clientX - rect.left
-  const y1 = e.clientY - rect.top
-  selectionBox.value = { x1, y1, x2: x1, y2: y1 }
+  const start = screenToCanvas(e.clientX, e.clientY)
+  selectionBox.value = { x1: start.x, y1: start.y, x2: start.x, y2: start.y }
   selectedIds.value.clear()
   let moved = false
 
   const onMove = (ev: MouseEvent) => {
     if (!selectionBox.value) return
     moved = true
-    selectionBox.value.x2 = ev.clientX - rect.left
-    selectionBox.value.y2 = ev.clientY - rect.top
+    const pos = screenToCanvas(ev.clientX, ev.clientY)
+    selectionBox.value.x2 = pos.x
+    selectionBox.value.y2 = pos.y
     // Select objects that overlap with the box (partial overlap)
     const bx1 = Math.min(selectionBox.value.x1, selectionBox.value.x2)
     const by1 = Math.min(selectionBox.value.y1, selectionBox.value.y2)
@@ -452,7 +480,9 @@ function startRotate(o: EditorObject, i: number, e: MouseEvent) {
 onMounted(() => {
   load()
   document.addEventListener('keydown', handleKeydown)
+  nextTick(initEditorResize)
 })
+onBeforeUnmount(() => { editorResizeObserver?.disconnect() })
 
 onUnmounted(() => {
   document.removeEventListener('keydown', handleKeydown)
@@ -536,17 +566,19 @@ onUnmounted(() => {
         </div>
 
         <!-- Canvas -->
-        <div class="flex-1 overflow-auto" style="max-height: 520px">
+        <div ref="editorContainerRef" class="flex-1 overflow-hidden rounded-xl border" :style="{ borderColor: 'var(--addrez-border)' }">
+          <div :style="{ width: ((activeFloor?.width || 1200) * canvasScale) + 'px', height: ((activeFloor?.height || 800) * canvasScale) + 'px', overflow: 'hidden' }">
           <div
             ref="canvasRef"
-            class="relative rounded-xl border overflow-hidden"
+            class="relative"
             :style="{
               width: (activeFloor?.width || 1200) + 'px',
               height: (activeFloor?.height || 800) + 'px',
               backgroundColor: canvasBg,
-              borderColor: 'var(--addrez-border)',
               backgroundImage: 'radial-gradient(circle, var(--addrez-border) 1px, transparent 1px)',
-              backgroundSize: '20px 20px'
+              backgroundSize: '20px 20px',
+              transform: `scale(${canvasScale})`,
+              transformOrigin: 'top left'
             }"
             @mousedown="startSelectionBox"
             @click="clearSelection"
@@ -594,6 +626,7 @@ onUnmounted(() => {
 
             <!-- Selection box -->
             <div v-if="selectionBox" :style="selBoxStyle()"></div>
+          </div>
           </div>
         </div>
       </div>

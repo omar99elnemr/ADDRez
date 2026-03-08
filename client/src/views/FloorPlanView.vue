@@ -1,10 +1,35 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed, watch, nextTick } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import api from '@/services/api'
 import type { Layout, TableItem, TimeSlot, CapacityData, GuestSearchResult, SeatingType, Tag } from '@/types'
 
 const toast = useToast()
+
+// ── Auto-fit canvas scaling ──
+const fpContainerRef = ref<HTMLElement | null>(null)
+const fpContainerWidth = ref(800)
+let fpResizeObserver: ResizeObserver | null = null
+
+const fpScale = computed(() => {
+  if (!activeFloorPlan.value) return 1
+  const cw = activeFloorPlan.value.width
+  const ch = activeFloorPlan.value.height
+  const availW = fpContainerWidth.value
+  const maxH = Math.max(300, window.innerHeight - 300)
+  return Math.min(availW / cw, maxH / ch, 1)
+})
+
+function initFpResize() {
+  if (fpContainerRef.value) {
+    fpContainerWidth.value = fpContainerRef.value.clientWidth
+    fpResizeObserver = new ResizeObserver(entries => {
+      for (const entry of entries) fpContainerWidth.value = entry.contentRect.width
+    })
+    fpResizeObserver.observe(fpContainerRef.value)
+  }
+}
+
 const layouts = ref<Layout[]>([])
 const timeSlots = ref<TimeSlot[]>([])
 const activeLayoutIdx = ref(0)
@@ -153,7 +178,8 @@ function getTableStyle(table: TableItem) {
   }
 }
 
-onMounted(loadLayouts)
+onMounted(() => { loadLayouts(); nextTick(initFpResize) })
+onBeforeUnmount(() => { fpResizeObserver?.disconnect() })
 </script>
 
 <template>
@@ -241,14 +267,16 @@ onMounted(loadLayouts)
       </div>
 
       <!-- Floor plan canvas -->
-      <div v-if="activeFloorPlan" class="card overflow-auto">
+      <div v-if="activeFloorPlan" ref="fpContainerRef" class="card overflow-hidden">
+        <div :style="{ width: (activeFloorPlan.width * fpScale) + 'px', height: (activeFloorPlan.height * fpScale) + 'px', overflow: 'hidden' }">
         <div
           class="relative"
           :style="{
             width: activeFloorPlan.width + 'px',
             height: activeFloorPlan.height + 'px',
             backgroundColor: activeFloorPlan.background_color || 'var(--addrez-bg-primary)',
-            minWidth: '100%'
+            transform: `scale(${fpScale})`,
+            transformOrigin: 'top left'
           }"
         >
           <!-- Tables -->
@@ -282,6 +310,7 @@ onMounted(loadLayouts)
           >
             <span class="text-xs font-semibold" style="color: #64748b">{{ lm.name }}</span>
           </div>
+        </div>
         </div>
 
         <!-- Legend -->
