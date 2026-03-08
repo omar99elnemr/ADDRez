@@ -442,7 +442,7 @@ onMounted(loadCustomer)
                   <th class="text-right py-2 px-3 font-medium">Amount Spent</th>
                 </tr></thead>
                 <tbody>
-                  <tr v-for="r in upcomingReservations" :key="r.id" class="border-t" :style="{ borderColor: 'var(--addrez-border)' }">
+                  <tr v-for="r in upcomingReservations" :key="r.id" class="border-t" style="transition: background-color 180ms ease" :style="{ borderColor: 'var(--addrez-border)' }" onmouseenter="this.style.backgroundColor='var(--addrez-table-row-hover)'" onmouseleave="this.style.backgroundColor='transparent'">
                     <td class="py-2 px-3" :style="{ color: 'var(--addrez-text-primary)' }">{{ r.date }} {{ r.time }}<br><span class="text-[10px]" :style="{ color: 'var(--addrez-text-secondary)' }">{{ r.time_slot_name || '—' }}</span></td>
                     <td class="py-2 px-3" :style="{ color: 'var(--addrez-text-primary)' }">{{ r.outlet_name || '—' }}</td>
                     <td class="py-2 px-3"><span class="text-xs px-2 py-0.5 rounded-full font-medium" :style="{ backgroundColor: (reservationStatusColors[r.status] || '#6b7280') + '20', color: reservationStatusColors[r.status] || '#6b7280' }">{{ r.status }}</span></td>
@@ -474,7 +474,7 @@ onMounted(loadCustomer)
                   <th class="text-right py-2 px-3 font-medium">Amount Spent</th>
                 </tr></thead>
                 <tbody>
-                  <tr v-for="r in pastReservations" :key="r.id" class="border-t" :style="{ borderColor: 'var(--addrez-border)' }">
+                  <tr v-for="r in pastReservations" :key="r.id" class="border-t" style="transition: background-color 180ms ease" :style="{ borderColor: 'var(--addrez-border)' }" onmouseenter="this.style.backgroundColor='var(--addrez-table-row-hover)'" onmouseleave="this.style.backgroundColor='transparent'">
                     <td class="py-2 px-3" :style="{ color: 'var(--addrez-text-primary)' }">{{ r.date }} {{ r.time }}<br><span class="text-[10px]" :style="{ color: 'var(--addrez-text-secondary)' }">{{ r.time_slot_name || '—' }}</span></td>
                     <td class="py-2 px-3" :style="{ color: 'var(--addrez-text-primary)' }">{{ r.outlet_name || '—' }}</td>
                     <td class="py-2 px-3"><span class="text-xs px-2 py-0.5 rounded-full font-medium" :style="{ backgroundColor: (reservationStatusColors[r.status] || '#6b7280') + '20', color: reservationStatusColors[r.status] || '#6b7280' }">{{ r.status }}</span></td>
@@ -506,7 +506,7 @@ onMounted(loadCustomer)
                 <th class="text-left py-3 px-3 font-medium">Done By</th>
               </tr></thead>
               <tbody>
-                <tr v-for="log in activityLogs" :key="log.id" class="border-t" :style="{ borderColor: 'var(--addrez-border)' }">
+                <tr v-for="log in activityLogs" :key="log.id" class="border-t" style="transition: background-color 180ms ease" :style="{ borderColor: 'var(--addrez-border)' }" onmouseenter="this.style.backgroundColor='var(--addrez-table-row-hover)'" onmouseleave="this.style.backgroundColor='transparent'">
                   <td class="py-3 px-3" :style="{ color: 'var(--addrez-text-primary)' }">{{ formatDateTime(log.created_at) }}</td>
                   <td class="py-3 px-3" :style="{ color: 'var(--addrez-text-primary)' }">{{ log.action }}</td>
                   <td class="py-3 px-3" :style="{ color: 'var(--addrez-text-secondary)' }">{{ log.description || '—' }}</td>
