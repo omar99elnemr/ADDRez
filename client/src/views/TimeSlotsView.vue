@@ -230,7 +230,7 @@ onMounted(loadTimeSlots)
     </div>
 
     <!-- Create/Edit Dialog -->
-    <div v-if="showDialog" class="fixed inset-0 z-50 flex items-center justify-center" style="background: rgba(0,0,0,0.5)">
+    <div v-if="showDialog" class="modal-overlay">
       <div class="card w-full max-w-lg mx-4 max-h-[85vh] overflow-y-auto" :style="{ backgroundColor: 'var(--addrez-bg-card)' }">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold" :style="{ color: 'var(--addrez-text-primary)' }">{{ editingId ? 'Edit Time Slot' : 'New Time Slot' }}</h3>

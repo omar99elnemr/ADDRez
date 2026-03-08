@@ -430,7 +430,7 @@ onMounted(loadAll)
     <!-- ═══════════════════════════════════════════════════════════ -->
 
     <!-- Tag Category Dialog -->
-    <div v-if="showCategoryDialog" class="fixed inset-0 z-50 flex items-center justify-center" style="background: rgba(0,0,0,0.5)">
+    <div v-if="showCategoryDialog" class="modal-overlay">
       <div class="card w-full max-w-sm mx-4" :style="{ backgroundColor: 'var(--addrez-bg-card)' }">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold" :style="{ color: 'var(--addrez-text-primary)' }">{{ editingCategoryId ? 'Edit Tag Category' : 'New Tag Category' }}</h3>
@@ -458,7 +458,7 @@ onMounted(loadAll)
     </div>
 
     <!-- Tag Dialog -->
-    <div v-if="showTagDialog" class="fixed inset-0 z-50 flex items-center justify-center" style="background: rgba(0,0,0,0.5)">
+    <div v-if="showTagDialog" class="modal-overlay">
       <div class="card w-full max-w-sm mx-4" :style="{ backgroundColor: 'var(--addrez-bg-card)' }">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold" :style="{ color: 'var(--addrez-text-primary)' }">{{ editingTagId ? 'Edit Tag' : 'New Tag' }}</h3>
@@ -502,7 +502,7 @@ onMounted(loadAll)
     </div>
 
     <!-- Client Category Dialog -->
-    <div v-if="showClientCatDialog" class="fixed inset-0 z-50 flex items-center justify-center" style="background: rgba(0,0,0,0.5)">
+    <div v-if="showClientCatDialog" class="modal-overlay">
       <div class="card w-full max-w-sm mx-4" :style="{ backgroundColor: 'var(--addrez-bg-card)' }">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold" :style="{ color: 'var(--addrez-text-primary)' }">{{ editingClientCatId ? 'Edit Category' : 'New Category' }}</h3>

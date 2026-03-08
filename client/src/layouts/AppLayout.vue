@@ -253,7 +253,7 @@ function handleLogout() {
     </div>
 
     <!-- Edit Profile Dialog -->
-    <div v-if="showProfileDialog" class="fixed inset-0 z-50 flex items-center justify-center" style="background: rgba(0,0,0,0.5)">
+    <div v-if="showProfileDialog" class="modal-overlay">
       <div class="card w-full max-w-sm mx-4" :style="{ backgroundColor: 'var(--addrez-bg-card)' }">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold" :style="{ color: 'var(--addrez-text-primary)' }"><i class="pi pi-user-edit mr-2"></i>Edit Profile</h3>
@@ -288,7 +288,7 @@ function handleLogout() {
     </div>
 
     <!-- Change Password Dialog -->
-    <div v-if="showPasswordDialog" class="fixed inset-0 z-50 flex items-center justify-center" style="background: rgba(0,0,0,0.5)">
+    <div v-if="showPasswordDialog" class="modal-overlay">
       <div class="card w-full max-w-sm mx-4" :style="{ backgroundColor: 'var(--addrez-bg-card)' }">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold" :style="{ color: 'var(--addrez-text-primary)' }"><i class="pi pi-lock mr-2"></i>Change Password</h3>

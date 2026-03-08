@@ -180,7 +180,7 @@ onMounted(load)
     </div>
 
     <!-- Create/Edit Dialog -->
-    <div v-if="showDialog" class="fixed inset-0 z-50 flex items-center justify-center" style="background: rgba(0,0,0,0.5)">
+    <div v-if="showDialog" class="modal-overlay">
       <div class="card w-full max-w-lg mx-4 max-h-[80vh] overflow-y-auto" :style="{ backgroundColor: 'var(--addrez-bg-card)' }">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold" :style="{ color: 'var(--addrez-text-primary)' }">{{ editingId ? 'Edit User' : 'New User' }}</h3>
@@ -250,7 +250,7 @@ onMounted(load)
     </div>
 
     <!-- Reset Password Dialog -->
-    <div v-if="showResetDialog" class="fixed inset-0 z-50 flex items-center justify-center" style="background: rgba(0,0,0,0.5)">
+    <div v-if="showResetDialog" class="modal-overlay">
       <div class="card w-full max-w-sm mx-4" :style="{ backgroundColor: 'var(--addrez-bg-card)' }">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold" :style="{ color: 'var(--addrez-text-primary)' }"><i class="pi pi-key mr-2"></i>Reset Password</h3>

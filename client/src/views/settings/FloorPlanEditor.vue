@@ -633,7 +633,7 @@ onUnmounted(() => {
     </template>
 
     <!-- Edit Object Dialog -->
-    <div v-if="showObjDialog && editingObj" class="fixed inset-0 z-50 flex items-center justify-center" style="background: rgba(0,0,0,0.5)">
+    <div v-if="showObjDialog && editingObj" class="modal-overlay">
       <div class="card w-full max-w-md mx-4" :style="{ backgroundColor: 'var(--addrez-bg-card)' }">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold" :style="{ color: 'var(--addrez-text-primary)' }">Edit {{ editingObj.type === 'table' ? 'Table' : 'Object' }}</h3>

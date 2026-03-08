@@ -532,7 +532,7 @@ onMounted(loadCustomer)
     </template>
 
     <!-- Manage Tags Dialog -->
-    <div v-if="showManageTags" class="fixed inset-0 z-50 flex items-center justify-center" style="background: rgba(0,0,0,0.5)">
+    <div v-if="showManageTags" class="modal-overlay">
       <div class="card w-full max-w-md mx-4" :style="{ backgroundColor: 'var(--addrez-bg-card)' }">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold" :style="{ color: 'var(--addrez-text-primary)' }"><i class="pi pi-tag mr-2" style="color: var(--addrez-gold)"></i>Manage Tags</h3>
@@ -559,7 +559,7 @@ onMounted(loadCustomer)
     </div>
 
     <!-- Blacklist Reason Dialog -->
-    <div v-if="showBlacklistDialog" class="fixed inset-0 z-50 flex items-center justify-center" style="background: rgba(0,0,0,0.5)">
+    <div v-if="showBlacklistDialog" class="modal-overlay">
       <div class="card w-full max-w-sm mx-4" :style="{ backgroundColor: 'var(--addrez-bg-card)' }">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold" style="color: #ef4444"><i class="pi pi-ban mr-2"></i>Blacklist Customer</h3>
@@ -577,7 +577,7 @@ onMounted(loadCustomer)
       </div>
     </div>
     <!-- Edit Customer Profile Dialog -->
-    <div v-if="showEditDialog" class="fixed inset-0 z-50 flex items-center justify-center" style="background: rgba(0,0,0,0.5)">
+    <div v-if="showEditDialog" class="modal-overlay">
       <div class="card w-full max-w-2xl mx-4 max-h-[85vh] overflow-y-auto" :style="{ backgroundColor: 'var(--addrez-bg-card)' }">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold" :style="{ color: 'var(--addrez-text-primary)' }"><i class="pi pi-pencil mr-2" style="color: #3b82f6"></i>Edit Customer Profile</h3>
